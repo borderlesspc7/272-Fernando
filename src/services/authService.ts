@@ -1,95 +1,130 @@
-import { auth } from "../lib/firebaseconfig";
+import { auth, db } from "../lib/firebaseconfig";
 import {
+  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  type Unsubscribe,
   onAuthStateChanged,
-  type User as FirebaseUser,
 } from "firebase/auth";
-import type { User } from "../types/user";
-import { webviewBridge } from "../lib/webviewBridge";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import type {
+  LoginCredentials,
+  RegisterCredentials,
+  User,
+} from "../types/user";
+import getFirebaseErrorMessage from "../components/ui/ErrorMessage";
 
-const TOKEN_KEY = "auth_token";
-const USER_KEY = "auth_user";
+interface firebaseError {
+  code?: string;
+  message?: string;
+}
 
 export const authService = {
-  async login(email: string, password: string): Promise<User> {
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-    const token = await userCredential.user.getIdToken();
-
-    const user = this.mapFirebaseUser(userCredential.user);
-
-    this.saveToken(token);
-    this.saveUser(user);
-
-    // Enviar token para o sistema pai
-    webviewBridge.sendToken(token);
-
-    return user;
+  async logOut(): Promise<void> {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      const message = getFirebaseErrorMessage(error as firebaseError | string);
+      throw new Error(message);
+    }
   },
 
-  // Logout
-  async logout(): Promise<void> {
-    await signOut(auth);
-    this.clearAuth();
-    webviewBridge.sendToParent({ type: "LOGOUT" });
-  },
+  async login(credentials: LoginCredentials): Promise<User> {
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        credentials.email,
+        credentials.password
+      );
 
-  // Salvar token recebido do WebView pai
-  setTokenFromWebView(token: string): void {
-    this.saveToken(token);
-    // Aqui você pode validar/decodificar o token se necessário
-  },
+      const firebaseUser = userCredential.user;
+      const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
 
-  // Observar mudanças de autenticação do Firebase
-  onAuthChange(callback: (user: User | null) => void): () => void {
-    return onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        const user = this.mapFirebaseUser(firebaseUser);
-        this.saveUser(user);
-        callback(user);
-      } else {
-        this.clearAuth();
-        callback(null);
+      if (!userDoc.exists()) {
+        throw new Error("Usuário não encontrado");
       }
-    });
+
+      const userData = userDoc.data() as User;
+      const updateUserData = {
+        ...userData,
+        lastLogin: new Date(),
+      };
+
+      await setDoc(doc(db, "users", firebaseUser.uid), updateUserData);
+      return updateUserData;
+    } catch (error) {
+      const message = getFirebaseErrorMessage(error as firebaseError | string);
+      throw new Error(message);
+    }
   },
 
-  // Helpers
-  mapFirebaseUser(firebaseUser: FirebaseUser): User {
-    return {
-      id: firebaseUser.uid,
-      email: firebaseUser.email || "",
-      name: firebaseUser.displayName || undefined,
-    };
+  async register(credentials: RegisterCredentials): Promise<User> {
+    try {
+      if (!credentials.email || !credentials.password || !credentials.name) {
+        throw new Error("Todos os campos são obrigatórios");
+      }
+
+      if (credentials.password.length < 6) {
+        throw new Error("A senha deve ter pelo menos 6 caracteres");
+      }
+
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        credentials.email,
+        credentials.password
+      );
+      const firebaseUser = userCredential.user;
+
+      const newUser: User = {
+        uid: firebaseUser.uid,
+        name: credentials.name,
+        email: credentials.email,
+        phone: credentials.phone,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        role: credentials.role || "user",
+      };
+
+      await setDoc(doc(db, "users", firebaseUser.uid), newUser);
+      return newUser;
+    } catch (error) {
+      const message = getFirebaseErrorMessage(error as firebaseError | string);
+      throw new Error(message);
+    }
   },
 
-  saveToken(token: string): void {
-    localStorage.setItem(TOKEN_KEY, token);
-  },
+  observeAuthState(callback: (user: User | null) => void): Unsubscribe {
+    try {
+      return onAuthStateChanged(auth, async (firebaseUser) => {
+        console.log(
+          "🔄 Auth state changed:",
+          firebaseUser ? firebaseUser.uid : "null"
+        );
 
-  getToken(): string | null {
-    return localStorage.getItem(TOKEN_KEY);
-  },
-
-  saveUser(user: User): void {
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
-  },
-
-  getUser(): User | null {
-    const userStr = localStorage.getItem(USER_KEY);
-    return userStr ? JSON.parse(userStr) : null;
-  },
-
-  clearAuth(): void {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
-  },
-
-  isAuthenticated(): boolean {
-    return !!this.getToken();
+        if (firebaseUser) {
+          // Usuário está logado, busca dados completos no Firestore
+          try {
+            const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
+            if (userDoc.exists()) {
+              const userData = userDoc.data() as User;
+              console.log("✅ Usuário autenticado:", userData);
+              callback(userData);
+            } else {
+              console.log("❌ Usuário não encontrado no Firestore");
+              callback(null); // Usuário não encontrado no Firestore
+            }
+          } catch (error) {
+            console.error("❌ Erro ao buscar dados do usuário:", error);
+            callback(null);
+          }
+        } else {
+          // Usuário não está logado
+          console.log("🚪 Usuário deslogado");
+          callback(null);
+        }
+      });
+    } catch (error) {
+      throw new Error("Erro ao observar estado de autenticação: " + error);
+    }
   },
 };
