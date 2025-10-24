@@ -4,6 +4,7 @@ import { paths } from "./paths";
 import { Layout } from "../components/Layout/Layout";
 import { Login } from "../pages/Login/Login";
 import { Register } from "../pages/Register/Register";
+import { Clients } from "../pages/Clients/Clients";
 
 export function AppRoutes() {
   function Dashboard() {
@@ -28,6 +29,7 @@ export function AppRoutes() {
             </ProtectedRoutes>
           }
         />
+        <Route path={paths.clients} element={<Clients />} />
       </Routes>
     </BrowserRouter>
   );
