@@ -1,17 +1,27 @@
 import { Navigate } from "react-router-dom";
-import { paths } from "./paths";
 import { useAuth } from "../hooks/useAuth";
-import type { ReactNode } from "react";
+import { paths } from "./paths";
 
 interface ProtectedRoutesProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export function ProtectedRoutes({ children }: ProtectedRoutesProps) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return null;
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <div>Carregando...</div>
+      </div>
+    );
   }
 
   if (!user) {

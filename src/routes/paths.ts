@@ -4,4 +4,5 @@ export const paths = {
   register: "/register",
   dashboard: "/dashboard",
   clients: "/clientes",
+  sales: "/vendas",
 };

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Layout } from "../../components/Layout/Layout";
 import { ClientStats } from "./components/ClientStats";
 import { ClientsTable } from "./components/ClientsTable";
 import { ClientModal } from "./components/ClientModal";
@@ -105,43 +104,41 @@ export function Clients() {
   };
 
   return (
-    <Layout>
-      <div className="clients-page">
-        <div className="page-header">
-          <div className="header-content">
-            <h1>Clientes</h1>
-            <p className="page-description">
-              Gerencie todos os clientes do sistema
-            </p>
-          </div>
-          <button className="btn-primary" onClick={handleCreateClient}>
-            <Plus size={20} />
-            Novo Cliente
-          </button>
+    <div className="clients-page">
+      <div className="page-header">
+        <div className="header-content">
+          <h1>Clientes</h1>
+          <p className="page-description">
+            Gerencie todos os clientes do sistema
+          </p>
         </div>
-
-        {stats && <ClientStats stats={stats} />}
-
-        <div className="clients-content">
-          <ClientFilters onFilterChange={handleFilterChange} />
-
-          <ClientsTable
-            clients={clients}
-            loading={loading}
-            onEdit={handleEditClient}
-            onDelete={handleDeleteClient}
-          />
-        </div>
-
-        {isModalOpen && (
-          <ClientModal
-            client={selectedClient}
-            onClose={handleModalClose}
-            onSuccess={handleModalSuccess}
-            createdBy={user?.uid || ""}
-          />
-        )}
+        <button className="btn-primary" onClick={handleCreateClient}>
+          <Plus size={20} />
+          Novo Cliente
+        </button>
       </div>
-    </Layout>
+
+      {stats && <ClientStats stats={stats} />}
+
+      <div className="clients-content">
+        <ClientFilters onFilterChange={handleFilterChange} />
+
+        <ClientsTable
+          clients={clients}
+          loading={loading}
+          onEdit={handleEditClient}
+          onDelete={handleDeleteClient}
+        />
+      </div>
+
+      {isModalOpen && (
+        <ClientModal
+          client={selectedClient}
+          onClose={handleModalClose}
+          onSuccess={handleModalSuccess}
+          createdBy={user?.uid || ""}
+        />
+      )}
+    </div>
   );
 }

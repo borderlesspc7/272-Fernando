@@ -1,0 +1,301 @@
+.sale-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: sale-fadeIn 0.2s ease;
+}
+
+.sale-modal-container {
+  background: white;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: sale-slideUp 0.3s ease;
+}
+
+.sale-modal-header {
+  padding: 2rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+}
+
+.sale-modal-header h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  color: var(--text-primary);
+}
+
+.sale-modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  transition: all 0.2s ease;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+.sale-modal-close:hover {
+  background: var(--gray-100);
+  color: var(--text-primary);
+}
+
+.sale-modal-form {
+  padding: 2rem;
+}
+
+.sale-form-section {
+  margin-bottom: 2rem;
+}
+
+.sale-form-section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.sale-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sale-form-group select,
+.sale-form-group input,
+.sale-form-group textarea {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.sale-form-group select:focus,
+.sale-form-group input:focus,
+.sale-form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.sale-form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.plan-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.plan-card {
+  padding: 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  cursor: pointer;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.plan-card:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+}
+
+.plan-card.selected {
+  border-color: var(--primary-color);
+  background: #f0f9ff;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.plan-card-name {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.plan-card-description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem 0;
+}
+
+.plan-card-price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #059669;
+  margin: 0;
+}
+
+.equipment-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.equipment-item {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.equipment-item:last-child {
+  border-bottom: none;
+}
+
+.sale-summary {
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+}
+
+.summary-row strong {
+  color: var(--text-primary);
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 0.5rem;
+  border-top: 2px solid var(--border-color);
+  margin-top: 0.5rem;
+}
+
+.summary-total-label {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.summary-total-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #059669;
+}
+
+.sale-modal-footer {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  position: sticky;
+  bottom: 0;
+  background: white;
+}
+
+.sale-btn-secondary,
+.sale-btn-submit {
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sale-btn-secondary {
+  background: var(--gray-100);
+  color: var(--text-secondary);
+}
+
+.sale-btn-secondary:hover:not(:disabled) {
+  background: var(--gray-200);
+}
+
+.sale-btn-submit {
+  background: var(--primary-color);
+  color: white;
+}
+
+.sale-btn-submit:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.sale-btn-submit:disabled,
+.sale-btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sale-form-error {
+  background: #fee;
+  color: #c33;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #c33;
+}
+
+.sale-spinner {
+  animation: sale-spin 1s linear infinite;
+}
+
+@keyframes sale-fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sale-slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes sale-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .plan-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sale-modal-header h2 {
+    font-size: 1.5rem;
+  }
+}
