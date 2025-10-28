@@ -14,6 +14,7 @@ import {
   type QueryConstraint,
 } from "firebase/firestore";
 import { db } from "../lib/firebaseconfig";
+import { stockService } from "./stockService";
 import type {
   Sale,
   CreateSaleData,
@@ -111,6 +112,31 @@ export const salesService = {
       };
 
       await setDoc(saleRef, newSale);
+
+      // Criar ordem de separação no estoque
+      try {
+        const deadline = new Date();
+        deadline.setDate(deadline.getDate() + 3); // Prazo de 3 dias
+
+        await stockService.createSeparationOrder(
+          saleRef.id,
+          data.clientId,
+          data.clientName,
+          data.plan.name,
+          data.equipment.map((eq) => ({
+            itemId: eq.id,
+            itemName: eq.name,
+            model: eq.model,
+            quantity: eq.quantity,
+          })),
+          data.createdBy,
+          deadline
+        );
+      } catch (stockError) {
+        console.error("Erro ao criar ordem de separação:", stockError);
+        // Não falha a venda se houver erro no estoque
+      }
+
       return convertTimestampToDate(newSale);
     } catch (error) {
       console.error("Erro ao criar venda:", error);

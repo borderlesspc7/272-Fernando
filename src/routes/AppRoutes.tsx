@@ -5,6 +5,7 @@ import { Login } from "../pages/Login/Login";
 import { Register } from "../pages/Register/Register";
 import { Clients } from "../pages/Clients/Clients";
 import { Sales } from "../pages/Sales/Sales";
+import { Stock } from "../pages/Stock/Stock";
 
 export function AppRoutes() {
   function Dashboard() {
@@ -35,6 +36,14 @@ export function AppRoutes() {
           element={
             <Layout>
               <Sales />
+            </Layout>
+          }
+        />
+        <Route
+          path={paths.stock}
+          element={
+            <Layout>
+              <Stock />
             </Layout>
           }
         />
