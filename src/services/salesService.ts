@@ -9,7 +9,6 @@ import {
   query,
   where,
   orderBy,
-  limit,
   Timestamp,
   type QueryConstraint,
 } from "firebase/firestore";
@@ -20,7 +19,6 @@ import type {
   CreateSaleData,
   UpdateSaleData,
   SaleFilters,
-  PaginatedSales,
   SaleStats,
   TimelineEvent,
   SaleDocument,
@@ -123,11 +121,11 @@ export const salesService = {
           data.clientId,
           data.clientName,
           data.plan.name,
-          data.equipment.map((eq) => ({
-            itemId: eq.id,
-            itemName: eq.name,
-            model: eq.model,
-            quantity: eq.quantity,
+          data.equipments.map((equipment) => ({
+            itemId: equipment.id,
+            itemName: equipment.name,
+            model: equipment.model,
+            quantity: equipment.quantity,
           })),
           data.createdBy,
           deadline

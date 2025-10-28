@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { FormEvent } from "react";
 import type { Client, CreateClientData, Address } from "../../../types/clients";
 import { clientService } from "../../../services/clientsService";

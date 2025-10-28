@@ -85,7 +85,11 @@ export function StockDispatchModal({
     setDispatchItems(dispatchItems.filter((_, i) => i !== index));
   };
 
-  const updateItem = (index: number, field: keyof DispatchItem, value: any) => {
+  const updateItem = (
+    index: number,
+    field: keyof DispatchItem,
+    value: string | number
+  ) => {
     const updated = [...dispatchItems];
     updated[index] = { ...updated[index], [field]: value };
     setDispatchItems(updated);
@@ -139,8 +143,9 @@ export function StockDispatchModal({
         if (order) {
           await salesService.updateSaleStatus(
             order.saleId,
-            "in_stock",
-            "Equipamentos despachados para instalação"
+            "dispatched",
+            "Equipamentos despachados para instalação",
+            createdBy
           );
         }
       }

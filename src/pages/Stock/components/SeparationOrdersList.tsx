@@ -1,5 +1,5 @@
 import type { SeparationOrder } from "../../../types/stock";
-import { Clock, CheckCircle2, Package, XCircle, Play } from "lucide-react";
+import { CheckCircle2, Package, XCircle, Play } from "lucide-react";
 import "../../Clients/components/ClientsTable.css";
 
 interface SeparationOrdersListProps {

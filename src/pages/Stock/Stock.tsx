@@ -15,7 +15,7 @@ import type {
   StockFilters as Filters,
   StockStats as Stats,
 } from "../../types/stock";
-import { Plus, Download, Upload, Send, Package } from "lucide-react";
+import { Plus, Download, Send, Package } from "lucide-react";
 import "./Stock.css";
 
 export function Stock() {
