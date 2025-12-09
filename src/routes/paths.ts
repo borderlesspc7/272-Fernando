@@ -6,4 +6,5 @@ export const paths = {
   clients: "/clientes",
   sales: "/vendas",
   stock: "/estoque",
+  logistics: "/logistica",
 };

@@ -6,6 +6,7 @@ import { Register } from "../pages/Register/Register";
 import { Clients } from "../pages/Clients/Clients";
 import { Sales } from "../pages/Sales/Sales";
 import { Stock } from "../pages/Stock/Stock";
+import { Logistics } from "../pages/Logistics/Logistics";
 
 export function AppRoutes() {
   function Dashboard() {
@@ -39,15 +40,23 @@ export function AppRoutes() {
             </Layout>
           }
         />
-        <Route
-          path={paths.stock}
-          element={
-            <Layout>
-              <Stock />
-            </Layout>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
-  );
+      <Route
+        path={paths.stock}
+        element={
+          <Layout>
+            <Stock />
+          </Layout>
+        }
+      />
+      <Route
+        path={paths.logistics}
+        element={
+          <Layout>
+            <Logistics />
+          </Layout>
+        }
+      />
+    </Routes>
+  </BrowserRouter>
+);
 }

@@ -4,6 +4,7 @@ import {
   Users,
   ShoppingCart,
   Package,
+  Truck,
   Wrench,
   AlertCircle,
   BarChart3,
@@ -41,6 +42,11 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       path: "/estoque",
       icon: Package,
       label: "Estoque",
+    },
+    {
+      path: "/logistica",
+      icon: Truck,
+      label: "Logística",
     },
     {
       path: "/ordens-servico",
