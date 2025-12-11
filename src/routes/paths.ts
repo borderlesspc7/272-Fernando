@@ -5,6 +5,7 @@ export const paths = {
   dashboard: "/dashboard",
   clients: "/clientes",
   sales: "/vendas",
+  installations: "/instalacoes",
   stock: "/estoque",
   logistics: "/logistica",
 };

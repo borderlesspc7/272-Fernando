@@ -49,9 +49,9 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       label: "Logística",
     },
     {
-      path: "/ordens-servico",
+      path: "/instalacoes",
       icon: Wrench,
-      label: "Ordens de Serviço",
+      label: "Instalações",
     },
     {
       path: "/ocorrencias",
