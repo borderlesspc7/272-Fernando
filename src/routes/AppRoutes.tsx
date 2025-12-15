@@ -8,6 +8,7 @@ import { Sales } from "../pages/Sales/Sales";
 import { Stock } from "../pages/Stock/Stock";
 import { Logistics } from "../pages/Logistics/Logistics";
 import { Installations } from "../pages/Installations/Installations";
+import Occurrences from "../pages/Occurrences/Occurrences";
 
 export function AppRoutes() {
   function Dashboard() {
@@ -63,6 +64,15 @@ export function AppRoutes() {
           element={
             <Layout>
               <Installations />
+            </Layout>
+          }
+        />
+
+        <Route
+          path={paths.occurrences}
+          element={
+            <Layout>
+              <Occurrences />
             </Layout>
           }
         />

@@ -1,0 +1,65 @@
+.occurrences-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.occurrences-stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.occurrences-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.occurrences-stat-open {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.occurrences-stat-progress {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.occurrences-stat-resolved {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.occurrences-stat-priority {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.occurrences-stat-content {
+  flex: 1;
+}
+
+.occurrences-stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.occurrences-stat-label {
+  font-size: 0.875rem;
+  color: #666;
+  font-weight: 500;
+}
+

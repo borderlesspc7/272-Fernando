@@ -1,0 +1,141 @@
+.occurrences-list-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.occurrences-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.occurrences-table thead {
+  background: #f9fafb;
+}
+
+.occurrences-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.occurrences-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 0.9rem;
+  color: #1f2937;
+}
+
+.occurrences-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.occurrences-id {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.occurrences-client {
+  font-weight: 500;
+}
+
+.occurrences-title {
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.occurrences-type {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.occurrences-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.occurrences-badge-success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.occurrences-badge-warning {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.occurrences-badge-danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.occurrences-badge-info {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.occurrences-badge-default {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.occurrences-technician {
+  color: #6b7280;
+}
+
+.occurrences-sub {
+  color: #9ca3af;
+  font-style: italic;
+  font-size: 0.875rem;
+}
+
+.occurrences-date {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.occurrences-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: #eff6ff;
+  color: #2563eb;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.occurrences-action-btn:hover {
+  background: #dbeafe;
+  transform: translateY(-1px);
+}
+
+.occurrences-empty {
+  background: white;
+  padding: 3rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.occurrences-empty p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 1rem;
+}
+
