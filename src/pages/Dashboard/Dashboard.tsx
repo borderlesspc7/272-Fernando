@@ -1,14 +1,13 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ShoppingCart, Users, AlertCircle, Package, Plus } from 'lucide-react';
-import { salesService } from '../../services/salesService';
-import { installationsService } from '../../services/installationsService';
-import { occurrencesService } from '../../services/occurrencesService';
-import { stockService } from '../../services/stockService';
-import { paths } from '../../routes/paths';
-import DashboardStats from './components/DashboardStats';
-import DashboardQuickActions from './components/DashboardQuickActions';
-import './Dashboard.css';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { salesService } from "../../services/salesService";
+import { installationsService } from "../../services/installationsService";
+import { occurrencesService } from "../../services/occurrencesService";
+import { stockService } from "../../services/stockService";
+import { paths } from "../../routes/paths";
+import DashboardStats from "./components/DashboardStats";
+import DashboardQuickActions from "./components/DashboardQuickActions";
+import "./Dashboard.css";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -36,12 +35,13 @@ export default function Dashboard() {
   const loadStats = async () => {
     try {
       setLoading(true);
-      const [salesStats, installationsStats, occurrencesStats, stockStats] = await Promise.all([
-        salesService.getSaleStats(),
-        installationsService.getStats(),
-        occurrencesService.getStats(),
-        stockService.getStats(),
-      ]);
+      const [salesStats, installationsStats, occurrencesStats, stockStats] =
+        await Promise.all([
+          salesService.getSaleStats(),
+          installationsService.getStats(),
+          occurrencesService.getStats(),
+          stockService.getStats(),
+        ]);
 
       setStats({
         sales: {
@@ -59,7 +59,7 @@ export default function Dashboard() {
         },
       });
     } catch (error) {
-      console.error('Error loading dashboard stats:', error);
+      console.error("Error loading dashboard stats:", error);
     } finally {
       setLoading(false);
     }
@@ -107,4 +107,3 @@ export default function Dashboard() {
     </div>
   );
 }
-
