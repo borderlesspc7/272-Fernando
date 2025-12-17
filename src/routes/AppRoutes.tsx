@@ -9,23 +9,30 @@ import { Stock } from "../pages/Stock/Stock";
 import { Logistics } from "../pages/Logistics/Logistics";
 import { Installations } from "../pages/Installations/Installations";
 import Occurrences from "../pages/Occurrences/Occurrences";
+import Dashboard from "../pages/Dashboard/Dashboard";
 
 export function AppRoutes() {
-  function Dashboard() {
-    return (
-      <Layout>
-        <div>Dashboard</div>
-      </Layout>
-    );
-  }
-
   return (
     <BrowserRouter>
       <Routes>
-        <Route path={paths.home} element={<Dashboard />} />
+        <Route
+          path={paths.home}
+          element={
+            <Layout>
+              <Dashboard />
+            </Layout>
+          }
+        />
         <Route path={paths.login} element={<Login />} />
         <Route path={paths.register} element={<Register />} />
-        <Route path={paths.dashboard} element={<Dashboard />} />
+        <Route
+          path={paths.dashboard}
+          element={
+            <Layout>
+              <Dashboard />
+            </Layout>
+          }
+        />
         <Route
           path={paths.clients}
           element={

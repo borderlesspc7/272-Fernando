@@ -1,0 +1,81 @@
+.dashboard-quick-actions {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-quick-actions-title {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.dashboard-quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.dashboard-quick-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.dashboard-quick-action-btn:hover {
+  border-color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-quick-action-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dashboard-quick-action-sale .dashboard-quick-action-icon {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.dashboard-quick-action-client .dashboard-quick-action-icon {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.dashboard-quick-action-occurrence .dashboard-quick-action-icon {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.dashboard-quick-action-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.dashboard-quick-action-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.dashboard-quick-action-description {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+

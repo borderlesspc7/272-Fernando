@@ -280,4 +280,24 @@ export const installationsService = {
       updatedAt: Timestamp.now(),
     });
   },
+
+  async getStats() {
+    try {
+      const installations = await this.getAllInstallations();
+      return {
+        total: installations.length,
+        pending: installations.filter((i) => i.status === "pending").length,
+        inProgress: installations.filter((i) => i.status === "in_progress").length,
+        completed: installations.filter((i) => i.status === "completed").length,
+      };
+    } catch (error) {
+      console.error("Erro ao buscar estatísticas de instalações:", error);
+      return {
+        total: 0,
+        pending: 0,
+        inProgress: 0,
+        completed: 0,
+      };
+    }
+  },
 };
