@@ -10,6 +10,7 @@ import { Logistics } from "../pages/Logistics/Logistics";
 import { Installations } from "../pages/Installations/Installations";
 import Occurrences from "../pages/Occurrences/Occurrences";
 import Dashboard from "../pages/Dashboard/Dashboard";
+import Technicians from "../pages/Technicians/Technicians";
 
 export function AppRoutes() {
   return (
@@ -65,7 +66,14 @@ export function AppRoutes() {
             </Layout>
           }
         />
-
+        <Route
+          path={paths.technicians}
+          element={
+            <Layout>
+              <Technicians />
+            </Layout>
+          }
+        />
         <Route
           path={paths.installations}
           element={

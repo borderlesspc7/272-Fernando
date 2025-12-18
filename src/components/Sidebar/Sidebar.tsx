@@ -1,7 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
-  Users,
   ShoppingCart,
   Package,
   Truck,
@@ -11,6 +10,7 @@ import {
   ChevronLeft,
   ChevronRight,
   CheckSquare,
+  UserCheck,
 } from "lucide-react";
 import "./Sidebar.css";
 
@@ -27,11 +27,6 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       path: "/dashboard",
       icon: LayoutDashboard,
       label: "Dashboard",
-    },
-    {
-      path: "/clientes",
-      icon: Users,
-      label: "Clientes",
     },
     {
       path: "/vendas",
@@ -57,6 +52,11 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       path: "/ocorrencias",
       icon: AlertCircle,
       label: "Ocorrências",
+    },
+    {
+      path: "/tecnicos",
+      icon: UserCheck,
+      label: "Técnicos",
     },
     {
       path: "/relatorios",

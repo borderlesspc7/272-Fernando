@@ -8,5 +8,6 @@ export const paths = {
   installations: "/instalacoes",
   stock: "/estoque",
   logistics: "/logistica",
+  technicians: "/tecnicos",
   occurrences: "/ocorrencias",
 };
