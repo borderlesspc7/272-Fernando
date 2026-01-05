@@ -11,6 +11,7 @@ import { Installations } from "../pages/Installations/Installations";
 import Occurrences from "../pages/Occurrences/Occurrences";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Technicians from "../pages/Technicians/Technicians";
+import Reports from "../pages/Reports/Reports";
 
 export function AppRoutes() {
   return (
@@ -88,6 +89,14 @@ export function AppRoutes() {
           element={
             <Layout>
               <Occurrences />
+            </Layout>
+          }
+        />
+        <Route
+          path={paths.reports}
+          element={
+            <Layout>
+              <Reports />
             </Layout>
           }
         />

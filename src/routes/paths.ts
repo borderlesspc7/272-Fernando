@@ -10,4 +10,5 @@ export const paths = {
   logistics: "/logistica",
   technicians: "/tecnicos",
   occurrences: "/ocorrencias",
+  reports: "/relatorios",
 };
