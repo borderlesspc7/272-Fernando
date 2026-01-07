@@ -45,6 +45,35 @@ export function ClientModal({
   // Dados comerciais
   const [companyName, setCompanyName] = useState(client?.companyName || "");
   const [tradeName, setTradeName] = useState(client?.tradeName || "");
+  const [instagram, setInstagram] = useState(client?.instagram || "");
+  const [paymentMethod, setPaymentMethod] = useState<
+    "credit_card" | "debit_card" | "bank_slip" | "pix" | "cash" | "bank_transfer" | ""
+  >(client?.paymentMethod || "");
+  const [contractDuration, setContractDuration] = useState<number>(
+    client?.contractDuration || 12
+  );
+  const [contractStartDate, setContractStartDate] = useState<string>(
+    client?.contractStartDate
+      ? new Date(
+          client.contractStartDate instanceof Date
+            ? client.contractStartDate
+            : (client.contractStartDate as any).toDate()
+        )
+          .toISOString()
+          .split("T")[0]
+      : ""
+  );
+  const [contractEndDate, setContractEndDate] = useState<string>(
+    client?.contractEndDate
+      ? new Date(
+          client.contractEndDate instanceof Date
+            ? client.contractEndDate
+            : (client.contractEndDate as any).toDate()
+        )
+          .toISOString()
+          .split("T")[0]
+      : ""
+  );
 
   // Endereços
   const [addresses, setAddresses] = useState<Address[]>(
@@ -200,6 +229,13 @@ export function ClientModal({
         notes: notes || undefined,
         companyName: companyName || undefined,
         tradeName: tradeName || undefined,
+        instagram: instagram || undefined,
+        paymentMethod: paymentMethod || undefined,
+        contractDuration: contractDuration || undefined,
+        contractStartDate: contractStartDate
+          ? new Date(contractStartDate)
+          : undefined,
+        contractEndDate: contractEndDate ? new Date(contractEndDate) : undefined,
         createdBy,
       };
 
@@ -365,6 +401,77 @@ export function ClientModal({
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Dados Comerciais */}
+          <div className="form-section">
+            <h3>Dados Comerciais</h3>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Instagram</label>
+                <input
+                  type="text"
+                  value={instagram}
+                  onChange={(e) => setInstagram(e.target.value)}
+                  placeholder="@usuario"
+                />
+              </div>
+              <div className="form-group">
+                <label>Forma de Pagamento</label>
+                <select
+                  value={paymentMethod}
+                  onChange={(e) =>
+                    setPaymentMethod(
+                      e.target.value as
+                        | "credit_card"
+                        | "debit_card"
+                        | "bank_slip"
+                        | "pix"
+                        | "cash"
+                        | "bank_transfer"
+                        | ""
+                    )
+                  }
+                >
+                  <option value="">Selecione...</option>
+                  <option value="credit_card">Cartão de Crédito</option>
+                  <option value="debit_card">Cartão de Débito</option>
+                  <option value="bank_slip">Boleto Bancário</option>
+                  <option value="pix">PIX</option>
+                  <option value="cash">Dinheiro</option>
+                  <option value="bank_transfer">Transferência Bancária</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Duração do Contrato (meses)</label>
+                <input
+                  type="number"
+                  value={contractDuration}
+                  onChange={(e) => setContractDuration(Number(e.target.value))}
+                  placeholder="12"
+                  min="1"
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Data de Início do Contrato</label>
+                <input
+                  type="date"
+                  value={contractStartDate}
+                  onChange={(e) => setContractStartDate(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label>Data de Término do Contrato</label>
+                <input
+                  type="date"
+                  value={contractEndDate}
+                  onChange={(e) => setContractEndDate(e.target.value)}
+                />
+              </div>
+            </div>
           </div>
 
           {/* Endereços */}

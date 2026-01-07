@@ -56,6 +56,14 @@ export interface Client {
   tradeName?: string;
   stateRegistration?: string;
 
+  // Novos campos
+  instagram?: string;
+  paymentMethod?: "credit_card" | "debit_card" | "bank_slip" | "pix" | "cash" | "bank_transfer";
+  contractDuration?: number; // Duração do contrato em meses
+  contractStartDate?: Date | Timestamp;
+  contractEndDate?: Date | Timestamp;
+  contractRenewalDate?: Date | Timestamp;
+
   createdAt: Date | Timestamp;
   updatedAt?: Date | Timestamp;
   lastServiceDate?: Date | Timestamp;
@@ -82,6 +90,11 @@ export interface CreateClientData {
   companyName?: string;
   tradeName?: string;
   stateRegistration?: string;
+  instagram?: string;
+  paymentMethod?: "credit_card" | "debit_card" | "bank_slip" | "pix" | "cash" | "bank_transfer";
+  contractDuration?: number;
+  contractStartDate?: Date | Timestamp;
+  contractEndDate?: Date | Timestamp;
   createdBy: string;
   tags?: string[];
 }
@@ -103,6 +116,11 @@ export interface UpdateClientData {
   companyName?: string;
   tradeName?: string;
   stateRegistration?: string;
+  instagram?: string;
+  paymentMethod?: "credit_card" | "debit_card" | "bank_slip" | "pix" | "cash" | "bank_transfer";
+  contractDuration?: number;
+  contractStartDate?: Date | Timestamp;
+  contractEndDate?: Date | Timestamp;
   tags?: string[];
 }
 

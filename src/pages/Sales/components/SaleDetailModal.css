@@ -425,3 +425,108 @@
     flex-wrap: wrap;
   }
 }
+
+/* Novos estilos para badges e tipos de documento */
+.detail-plan-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.detail-plan-badge-basic {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.detail-plan-badge-intermediate {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.detail-plan-badge-premium {
+  background: #fce7f3;
+  color: #831843;
+}
+
+.detail-contract-type {
+  padding: 1rem;
+  background: #f0f9ff;
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-color);
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.detail-upload-select {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  background: white;
+  cursor: pointer;
+  flex: 1;
+}
+
+.detail-upload-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.detail-upload-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.detail-document-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.detail-document-type {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.detail-document-type-signed_proposal {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.detail-document-type-contract {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.detail-document-type-client_documents {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.detail-document-type-payment_proof {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.detail-document-type-installation_photo {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.detail-document-type-other {
+  background: #f3f4f6;
+  color: #4b5563;
+}

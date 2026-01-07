@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
-import type { CreateSaleData, Equipment } from "../../../types/sales";
-import { AVAILABLE_PLANS, EQUIPMENT_TEMPLATES } from "../../../types/sales";
+import type { CreateSaleData, Equipment, ContractType } from "../../../types/sales";
+import { AVAILABLE_PLANS, EQUIPMENT_TEMPLATES, CONTRACT_TYPE_LABELS, OFFER_CATEGORY_LABELS } from "../../../types/sales";
 import { salesService } from "../../../services/salesService";
 import { clientService } from "../../../services/clientsService";
 import type { Client } from "../../../types/clients";
@@ -21,6 +21,7 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClientId, setSelectedClientId] = useState("");
   const [selectedPlanId, setSelectedPlanId] = useState("");
+  const [contractType, setContractType] = useState<ContractType>("simplified_adhesion");
   const [installationFee, setInstallationFee] = useState(0);
   const [notes, setNotes] = useState("");
 
@@ -64,6 +65,7 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
         clientId: client.id,
         clientName: client.name,
         plan,
+        contractType,
         equipments,
         payment: {
           totalValue: plan.value + installationFee,
@@ -125,7 +127,7 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
           </div>
 
           <div className="sale-form-section">
-            <h3>Escolher Plano</h3>
+            <h3>Escolher Plano (Categoria de Oferta)</h3>
             <div className="plan-cards-grid">
               {AVAILABLE_PLANS.map((plan) => (
                 <div
@@ -138,6 +140,11 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
                     setInstallationFee(plan.installationFee || 0);
                   }}
                 >
+                  {plan.category && (
+                    <span className={`plan-category plan-category-${plan.category}`}>
+                      {OFFER_CATEGORY_LABELS[plan.category]}
+                    </span>
+                  )}
                   <h4 className="plan-card-name">{plan.name}</h4>
                   <p className="plan-card-description">{plan.description}</p>
                   <p className="plan-card-price">
@@ -145,6 +152,27 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
                   </p>
                 </div>
               ))}
+            </div>
+          </div>
+
+          <div className="sale-form-section">
+            <h3>Forma de Contratação</h3>
+            <div className="sale-form-group">
+              <select
+                value={contractType}
+                onChange={(e) => setContractType(e.target.value as ContractType)}
+                required
+              >
+                <option value="simplified_adhesion">
+                  {CONTRACT_TYPE_LABELS.simplified_adhesion}
+                </option>
+                <option value="monthly_advance">
+                  {CONTRACT_TYPE_LABELS.monthly_advance}
+                </option>
+                <option value="equipment_sale">
+                  {CONTRACT_TYPE_LABELS.equipment_sale}
+                </option>
+              </select>
             </div>
           </div>
 
@@ -164,16 +192,28 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
               </div>
 
               <div className="sale-form-section">
-                <h3>Equipamentos Inclusos</h3>
-                <ul className="equipment-list">
+                <h3>Equipamentos Inclusos (Detalhamento)</h3>
+                <div className="equipment-list">
                   {(EQUIPMENT_TEMPLATES[selectedPlanId] || []).map(
                     (eq, index) => (
-                      <li key={index} className="equipment-item">
-                        • {eq.name} ({eq.model}) - Qtd: {eq.quantity}
-                      </li>
+                      <div key={index} className="equipment-item">
+                        <div className="equipment-info">
+                          <span className="equipment-name">
+                            {eq.name}
+                          </span>
+                          <span className="equipment-details">
+                            Modelo: {eq.model} | Qtd: {eq.quantity}
+                          </span>
+                          {eq.notes && (
+                            <span className="equipment-notes">
+                              {eq.notes}
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     )
                   )}
-                </ul>
+                </div>
               </div>
 
               <div className="sale-form-section">

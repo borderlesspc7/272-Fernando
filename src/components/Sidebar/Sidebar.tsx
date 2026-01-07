@@ -11,6 +11,7 @@ import {
   ChevronRight,
   CheckSquare,
   UserCheck,
+  Users,
 } from "lucide-react";
 import "./Sidebar.css";
 
@@ -27,6 +28,11 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       path: "/dashboard",
       icon: LayoutDashboard,
       label: "Dashboard",
+    },
+    {
+      path: "/clientes",
+      icon: Users,
+      label: "Clientes",
     },
     {
       path: "/vendas",

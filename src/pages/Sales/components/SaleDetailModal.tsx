@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Sale, SaleDocument } from "../../../types/sales";
+import { DOCUMENT_TYPE_LABELS, CONTRACT_TYPE_LABELS, OFFER_CATEGORY_LABELS } from "../../../types/sales";
 import { salesService } from "../../../services/salesService";
 import { useAuth } from "../../../hooks/useAuth";
 import { X, Upload, FileText } from "lucide-react";
@@ -22,6 +23,7 @@ export function SaleDetailModal({
   );
   const [updating, setUpdating] = useState(false);
   const [uploadName, setUploadName] = useState("");
+  const [documentType, setDocumentType] = useState<SaleDocument["type"]>("other");
 
   const handleStatusUpdate = async (newStatus: Sale["status"]) => {
     try {
@@ -47,13 +49,14 @@ export function SaleDetailModal({
     try {
       const mockDocument: Omit<SaleDocument, "id" | "uploadedAt"> = {
         name: uploadName,
-        type: "other",
+        type: documentType,
         url: `https://mock-storage.com/${Date.now()}-${uploadName}`,
         uploadedBy: user?.uid || "",
       };
 
       await salesService.addDocument(sale.id, mockDocument, user?.uid || "");
       setUploadName("");
+      setDocumentType("other");
       onUpdate();
     } catch (error) {
       console.error("Erro ao adicionar documento", error);
@@ -115,6 +118,11 @@ export function SaleDetailModal({
               <div>
                 <h3 className="detail-section-title">Plano</h3>
                 <div className="detail-plan-card">
+                  {sale.plan.category && (
+                    <span className={`detail-plan-badge detail-plan-badge-${sale.plan.category}`}>
+                      {OFFER_CATEGORY_LABELS[sale.plan.category]}
+                    </span>
+                  )}
                   <p className="detail-plan-name">{sale.plan.name}</p>
                   <p className="detail-plan-description">
                     {sale.plan.description}
@@ -124,6 +132,15 @@ export function SaleDetailModal({
                   </p>
                 </div>
               </div>
+
+              {sale.contractType && (
+                <div>
+                  <h3 className="detail-section-title">Forma de Contratação</h3>
+                  <p className="detail-contract-type">
+                    {CONTRACT_TYPE_LABELS[sale.contractType]}
+                  </p>
+                </div>
+              )}
 
               <div>
                 <h3 className="detail-section-title">Equipamentos</h3>
@@ -200,6 +217,18 @@ export function SaleDetailModal({
                   no servidor
                 </p>
                 <div className="detail-upload-form">
+                  <select
+                    value={documentType}
+                    onChange={(e) => setDocumentType(e.target.value as SaleDocument["type"])}
+                    className="detail-upload-select"
+                  >
+                    <option value="signed_proposal">{DOCUMENT_TYPE_LABELS.signed_proposal}</option>
+                    <option value="contract">{DOCUMENT_TYPE_LABELS.contract}</option>
+                    <option value="client_documents">{DOCUMENT_TYPE_LABELS.client_documents}</option>
+                    <option value="payment_proof">{DOCUMENT_TYPE_LABELS.payment_proof}</option>
+                    <option value="installation_photo">{DOCUMENT_TYPE_LABELS.installation_photo}</option>
+                    <option value="other">{DOCUMENT_TYPE_LABELS.other}</option>
+                  </select>
                   <input
                     type="text"
                     placeholder="Nome do documento..."
@@ -232,7 +261,12 @@ export function SaleDetailModal({
                         className="detail-document-icon"
                       />
                       <div className="detail-document-info">
-                        <p className="detail-document-name">{doc.name}</p>
+                        <div className="detail-document-header">
+                          <p className="detail-document-name">{doc.name}</p>
+                          <span className={`detail-document-type detail-document-type-${doc.type}`}>
+                            {DOCUMENT_TYPE_LABELS[doc.type]}
+                          </span>
+                        </div>
                         <p className="detail-document-date">
                           {formatDate(doc.uploadedAt as Date)}
                         </p>

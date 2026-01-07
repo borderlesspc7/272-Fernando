@@ -112,6 +112,32 @@
   cursor: pointer;
   background: white;
   transition: all 0.2s ease;
+  position: relative;
+}
+
+.plan-category {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.plan-category-basic {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.plan-category-intermediate {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.plan-category-premium {
+  background: #fce7f3;
+  color: #831843;
 }
 
 .plan-card:hover {
@@ -146,19 +172,42 @@
 }
 
 .equipment-list {
-  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
   padding: 0;
   margin: 0;
 }
 
 .equipment-item {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid var(--border-color);
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.equipment-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.equipment-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.equipment-details {
+  font-size: 0.85rem;
   color: var(--text-secondary);
 }
 
-.equipment-item:last-child {
-  border-bottom: none;
+.equipment-notes {
+  font-size: 0.8rem;
+  color: #059669;
+  font-style: italic;
+  margin-top: 0.25rem;
 }
 
 .sale-summary {

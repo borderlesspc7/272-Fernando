@@ -14,6 +14,15 @@ export type SaleStatus =
 // Status de pagamento
 export type PaymentStatus = "pending" | "paid" | "overdue" | "cancelled";
 
+// Categoria de oferta comercial
+export type OfferCategory = "basic" | "intermediate" | "premium";
+
+// Forma de contratação
+export type ContractType =
+  | "monthly_advance" // Antecipação de mensalidade
+  | "simplified_adhesion" // Adesão simplificada
+  | "equipment_sale"; // Venda de equipamento
+
 // Tipo de plano
 export interface Plan {
   id: string;
@@ -22,23 +31,42 @@ export interface Plan {
   value: number;
   installationFee?: number;
   features?: string[];
+  category?: OfferCategory; // Categoria da oferta (básico, intermediário, prêmio)
 }
+
+// Tipo de equipamento
+export type EquipmentType = 
+  | "court" // Quadra
+  | "camera" // Câmera
+  | "banner" // Banner
+  | "router" // Roteador
+  | "converter" // Conversor
+  | "cable" // Cabo
+  | "other"; // Outros
 
 // Equipamento associado à venda
 export interface Equipment {
   id: string;
   name: string;
   model: string;
+  type?: EquipmentType;
   serialNumber?: string;
   quantity: number;
   status: "pending" | "separated" | "dispatched" | "installed";
+  notes?: string; // Observações sobre o equipamento
 }
 
 // Documento anexado
 export interface SaleDocument {
   id: string;
   name: string;
-  type: "contract" | "payment_proof" | "installation_photo" | "other";
+  type: 
+    | "signed_proposal" // Proposta assinada
+    | "contract" // Contrato
+    | "client_documents" // Documentos do cliente
+    | "payment_proof" // Comprovante de pagamento
+    | "installation_photo" // Foto de instalação
+    | "other"; // Outros
   url: string; // Simulado - URL fictícia
   uploadedAt: Date | Timestamp;
   uploadedBy: string;
@@ -73,6 +101,9 @@ export interface Sale {
 
   // Plano
   plan: Plan;
+
+  // Forma de contratação
+  contractType?: ContractType;
 
   // Equipamentos
   equipments: Equipment[];
@@ -125,6 +156,7 @@ export interface CreateSaleData {
   clientId: string;
   clientName: string;
   plan: Plan;
+  contractType?: ContractType;
   equipments: Equipment[];
   payment: Payment;
   installationAddress: Sale["installationAddress"];
@@ -185,12 +217,13 @@ export interface SaleStats {
 // Planos disponíveis no sistema
 export const AVAILABLE_PLANS: Plan[] = [
   {
-    id: "plan-replay-gold",
-    name: "Replay Gold",
-    description: "Plano premium com recursos avançados",
-    value: 199.9,
-    installationFee: 99.9,
-    features: ["Suporte 24/7", "Equipamentos premium", "Instalação grátis"],
+    id: "plan-replay-bronze",
+    name: "Replay Bronze",
+    description: "Plano básico ideal para iniciantes",
+    value: 99.9,
+    installationFee: 59.9,
+    category: "basic",
+    features: ["Suporte por email", "Equipamentos básicos"],
   },
   {
     id: "plan-replay-silver",
@@ -198,15 +231,17 @@ export const AVAILABLE_PLANS: Plan[] = [
     description: "Plano intermediário com ótimo custo-benefício",
     value: 149.9,
     installationFee: 79.9,
+    category: "intermediate",
     features: ["Suporte em horário comercial", "Equipamentos padrão"],
   },
   {
-    id: "plan-replay-bronze",
-    name: "Replay Bronze",
-    description: "Plano básico ideal para iniciantes",
-    value: 99.9,
-    installationFee: 59.9,
-    features: ["Suporte por email", "Equipamentos básicos"],
+    id: "plan-replay-gold",
+    name: "Replay Gold",
+    description: "Plano premium com recursos avançados",
+    value: 199.9,
+    installationFee: 99.9,
+    category: "premium",
+    features: ["Suporte 24/7", "Equipamentos premium", "Instalação grátis"],
   },
   {
     id: "plan-replay-business",
@@ -214,6 +249,7 @@ export const AVAILABLE_PLANS: Plan[] = [
     description: "Plano empresarial com recursos corporativos",
     value: 299.9,
     installationFee: 149.9,
+    category: "premium",
     features: [
       "Suporte dedicado",
       "SLA garantido",
@@ -224,67 +260,166 @@ export const AVAILABLE_PLANS: Plan[] = [
 
 // Templates de equipamentos por plano
 export const EQUIPMENT_TEMPLATES: Record<string, Omit<Equipment, "id">[]> = {
-  "plan-replay-gold": [
+  "plan-replay-bronze": [
     {
-      name: "Roteador Premium",
-      model: "RT-5000",
+      name: "Roteador Básico",
+      model: "RT-1000",
+      type: "router",
       quantity: 1,
       status: "pending",
     },
     {
-      name: "Conversor Óptico",
-      model: "CO-300",
+      name: "Câmera HD",
+      model: "CAM-HD-720",
+      type: "camera",
       quantity: 1,
       status: "pending",
     },
-    { name: "Cabo de Rede 10m", model: "CAT6", quantity: 1, status: "pending" },
   ],
   "plan-replay-silver": [
     {
       name: "Roteador Padrão",
       model: "RT-3000",
+      type: "router",
       quantity: 1,
       status: "pending",
     },
     {
       name: "Conversor Óptico",
       model: "CO-200",
+      type: "converter",
+      quantity: 1,
+      status: "pending",
+    },
+    {
+      name: "Câmera Full HD",
+      model: "CAM-FHD-1080",
+      type: "camera",
+      quantity: 2,
+      status: "pending",
+    },
+    {
+      name: "Banner Publicitário",
+      model: "BAN-STANDARD",
+      type: "banner",
       quantity: 1,
       status: "pending",
     },
   ],
-  "plan-replay-bronze": [
+  "plan-replay-gold": [
     {
-      name: "Roteador Básico",
-      model: "RT-1000",
+      name: "Roteador Premium",
+      model: "RT-5000",
+      type: "router",
       quantity: 1,
       status: "pending",
+    },
+    {
+      name: "Conversor Óptico",
+      model: "CO-300",
+      type: "converter",
+      quantity: 1,
+      status: "pending",
+    },
+    {
+      name: "Câmera 4K",
+      model: "CAM-4K-UHD",
+      type: "camera",
+      quantity: 4,
+      status: "pending",
+    },
+    {
+      name: "Banner Premium",
+      model: "BAN-PREMIUM",
+      type: "banner",
+      quantity: 2,
+      status: "pending",
+    },
+    { 
+      name: "Cabo de Rede 10m", 
+      model: "CAT6", 
+      type: "cable",
+      quantity: 1, 
+      status: "pending" 
     },
   ],
   "plan-replay-business": [
     {
       name: "Roteador Empresarial",
       model: "RT-7000",
-      quantity: 1,
-      status: "pending",
-    },
-    {
-      name: "Switch Gerenciável",
-      model: "SW-24P",
+      type: "router",
       quantity: 1,
       status: "pending",
     },
     {
       name: "Conversor Óptico",
       model: "CO-500",
+      type: "converter",
       quantity: 2,
       status: "pending",
     },
     {
+      name: "Câmera 4K Pro",
+      model: "CAM-4K-PRO",
+      type: "camera",
+      quantity: 8,
+      status: "pending",
+      notes: "Com visão noturna e AI"
+    },
+    {
+      name: "Banner Digital",
+      model: "BAN-DIGITAL",
+      type: "banner",
+      quantity: 4,
+      status: "pending",
+      notes: "Com telão LED"
+    },
+    {
+      name: "Sistema Quadra Completo",
+      model: "COURT-SYSTEM-PRO",
+      type: "court",
+      quantity: 1,
+      status: "pending",
+      notes: "Inclui sensores e iluminação"
+    },
+    {
       name: "Cabo de Rede 15m",
       model: "CAT6A",
+      type: "cable",
       quantity: 2,
       status: "pending",
     },
   ],
+};
+
+// Labels para exibição
+export const OFFER_CATEGORY_LABELS: Record<OfferCategory, string> = {
+  basic: "Básico",
+  intermediate: "Intermediário",
+  premium: "Prêmio",
+};
+
+export const CONTRACT_TYPE_LABELS: Record<ContractType, string> = {
+  monthly_advance: "Antecipação de Mensalidade",
+  simplified_adhesion: "Adesão Simplificada",
+  equipment_sale: "Venda de Equipamento",
+};
+
+export const EQUIPMENT_TYPE_LABELS: Record<EquipmentType, string> = {
+  court: "Quadra",
+  camera: "Câmera",
+  banner: "Banner",
+  router: "Roteador",
+  converter: "Conversor",
+  cable: "Cabo",
+  other: "Outros",
+};
+
+export const DOCUMENT_TYPE_LABELS: Record<SaleDocument["type"], string> = {
+  signed_proposal: "Proposta Assinada",
+  contract: "Contrato",
+  client_documents: "Documentos do Cliente",
+  payment_proof: "Comprovante de Pagamento",
+  installation_photo: "Foto de Instalação",
+  other: "Outros",
 };
