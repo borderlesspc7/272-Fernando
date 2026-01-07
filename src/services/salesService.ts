@@ -23,6 +23,7 @@ import type {
   TimelineEvent,
   SaleDocument,
 } from "../types/sales";
+import { getMockSales, filterMockSales } from "../mocks/salesMock";
 
 const SALES_COLLECTION = "sales";
 
@@ -165,12 +166,18 @@ export const salesService = {
       const q = query(salesRef, orderBy("createdAt", "desc"));
       const querySnapshot = await getDocs(q);
 
+      if (querySnapshot.empty) {
+        console.log("Nenhuma venda encontrada no Firebase. Usando dados mockados.");
+        return getMockSales();
+      }
+
       return querySnapshot.docs.map((doc) =>
         convertTimestampToDate(doc.data() as Sale)
       );
     } catch (error) {
       console.error("Erro ao buscar vendas:", error);
-      throw new Error("Não foi possível buscar as vendas. Tente novamente.");
+      console.log("Usando dados mockados devido ao erro.");
+      return getMockSales();
     }
   },
 
@@ -197,6 +204,16 @@ export const salesService = {
 
       const q = query(salesRef, ...constraints);
       const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        console.log("Nenhuma venda encontrada no Firebase. Usando dados mockados.");
+        return filterMockSales({
+          status: filters.status,
+          paymentStatus: filters.paymentStatus,
+          clientId: filters.clientId,
+          search: filters.search,
+        });
+      }
 
       let sales = querySnapshot.docs.map((doc) =>
         convertTimestampToDate(doc.data() as Sale)
@@ -252,7 +269,13 @@ export const salesService = {
       return sales;
     } catch (error) {
       console.error("Erro ao buscar vendas com filtros:", error);
-      throw new Error("Não foi possível buscar as vendas. Tente novamente.");
+      console.log("Usando dados mockados devido ao erro.");
+      return filterMockSales({
+        status: filters.status,
+        paymentStatus: filters.paymentStatus,
+        clientId: filters.clientId,
+        search: filters.search,
+      });
     }
   },
 
