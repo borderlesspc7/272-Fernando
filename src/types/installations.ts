@@ -32,6 +32,10 @@ export interface Installation {
     quantity: number;
   }[];
   photos: InstallationPhoto[];
+  invoiceNumber?: string; // Número da nota fiscal
+  invoiceDate?: Date | Timestamp; // Data da nota fiscal
+  invoiceUrl?: string; // URL do documento da nota fiscal
+  progress?: number; // Progresso da instalação (0-100%)
   notes?: string;
   createdAt: Date | Timestamp;
   updatedAt: Date | Timestamp;

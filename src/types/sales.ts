@@ -3,6 +3,7 @@ import type { Timestamp } from "firebase/firestore";
 // Status da venda na jornada
 export type SaleStatus =
   | "pending" // Aguardando processamento
+  | "analyzing_stock" // Análise de estoque e montagem
   | "in_progress" // Em andamento
   | "stock_separated" // Estoque separado
   | "dispatched" // Despachado para instalação
@@ -113,6 +114,9 @@ export interface Sale {
 
   // Status
   status: SaleStatus;
+
+  // Progresso da instalação (0-100%)
+  progress?: number;
 
   // Endereço de instalação
   installationAddress: {
@@ -422,4 +426,16 @@ export const DOCUMENT_TYPE_LABELS: Record<SaleDocument["type"], string> = {
   payment_proof: "Comprovante de Pagamento",
   installation_photo: "Foto de Instalação",
   other: "Outros",
+};
+
+export const SALE_STATUS_LABELS: Record<SaleStatus, string> = {
+  pending: "Pendente",
+  analyzing_stock: "Análise de Estoque",
+  in_progress: "Em Andamento",
+  stock_separated: "Estoque Separado",
+  dispatched: "Despachado",
+  installing: "Em Instalação",
+  active: "Ativo",
+  cancelled: "Cancelado",
+  suspended: "Suspenso",
 };

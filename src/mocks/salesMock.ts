@@ -63,6 +63,7 @@ export const mockSales: Sale[] = [
       paymentStatus: "paid",
     },
     status: "active",
+    progress: 100, // 100% instalado e ativo
     installationAddress: {
       street: "Rua das Flores",
       number: "123",
@@ -223,6 +224,7 @@ export const mockSales: Sale[] = [
       paymentStatus: "paid",
     },
     status: "active",
+    progress: 100, // 100% instalado e ativo
     installationAddress: {
       street: "Rua dos Esportes",
       number: "2500",
@@ -381,6 +383,7 @@ export const mockSales: Sale[] = [
       paymentStatus: "paid",
     },
     status: "active",
+    progress: 95, // 95% quase concluído
     installationAddress: {
       street: "Avenida Paulista",
       number: "1000",
@@ -489,6 +492,7 @@ export const mockSales: Sale[] = [
       paymentStatus: "paid",
     },
     status: "active",
+    progress: 100, // 100% concluído
     installationAddress: {
       street: "Rua Copacabana",
       number: "500",
@@ -607,6 +611,7 @@ export const mockSales: Sale[] = [
       paymentStatus: "paid",
     },
     status: "active",
+    progress: 90, // 90% instalação quase concluída
     installationAddress: {
       street: "Avenida dos Restaurantes",
       number: "1500",
@@ -721,7 +726,8 @@ export const mockSales: Sale[] = [
       paymentMethod: "pix",
       paymentStatus: "pending",
     },
-    status: "pending",
+    status: "analyzing_stock", // Em análise de estoque
+    progress: 10, // 10% apenas iniciado
     installationAddress: {
       street: "Rua das Palmeiras",
       number: "789",

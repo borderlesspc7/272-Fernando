@@ -214,3 +214,40 @@
 .installation-empty {
   color: #64748b;
 }
+
+.invoice-link {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.invoice-link:hover {
+  text-decoration: underline;
+}
+
+.installation-progress {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.installation-progress-bar {
+  flex: 1;
+  height: 20px;
+  background: #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.installation-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  transition: width 0.3s ease;
+}
+
+.installation-progress-label {
+  font-weight: 700;
+  color: var(--text-primary);
+  min-width: 45px;
+  text-align: right;
+}

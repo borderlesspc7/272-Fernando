@@ -192,6 +192,52 @@ export function InstallationDetailModal({
                 </ul>
               </div>
 
+              {(installation.invoiceNumber || installation.invoiceDate) && (
+                <div className="installation-card">
+                  <h3>Nota Fiscal</h3>
+                  {installation.invoiceNumber && (
+                    <p>
+                      <strong>Número:</strong> {installation.invoiceNumber}
+                    </p>
+                  )}
+                  {installation.invoiceDate && (
+                    <p>
+                      <strong>Data:</strong>{" "}
+                      {fmtDateTime(installation.invoiceDate as Date)}
+                    </p>
+                  )}
+                  {installation.invoiceUrl && (
+                    <p>
+                      <a
+                        href={installation.invoiceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="invoice-link"
+                      >
+                        Ver documento
+                      </a>
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {installation.progress !== undefined && (
+                <div className="installation-card">
+                  <h3>Progresso da Instalação</h3>
+                  <div className="installation-progress">
+                    <div className="installation-progress-bar">
+                      <div
+                        className="installation-progress-fill"
+                        style={{ width: `${installation.progress}%` }}
+                      />
+                    </div>
+                    <span className="installation-progress-label">
+                      {installation.progress}%
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {installation.notes && (
                 <div className="installation-card">
                   <h3>Observações</h3>

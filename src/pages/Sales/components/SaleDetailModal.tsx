@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Sale, SaleDocument } from "../../../types/sales";
-import { DOCUMENT_TYPE_LABELS, CONTRACT_TYPE_LABELS, OFFER_CATEGORY_LABELS } from "../../../types/sales";
+import { DOCUMENT_TYPE_LABELS, CONTRACT_TYPE_LABELS, OFFER_CATEGORY_LABELS, SALE_STATUS_LABELS } from "../../../types/sales";
 import { salesService } from "../../../services/salesService";
 import { useAuth } from "../../../hooks/useAuth";
 import { X, Upload, FileText } from "lucide-react";
@@ -156,6 +156,21 @@ export function SaleDetailModal({
                 ))}
               </div>
 
+              {sale.progress !== undefined && (
+                <div>
+                  <h3 className="detail-section-title">Progresso da Instalação</h3>
+                  <div className="progress-container">
+                    <div className="progress-bar">
+                      <div 
+                        className="progress-fill" 
+                        style={{ width: `${sale.progress}%` }}
+                      />
+                    </div>
+                    <span className="progress-label">{sale.progress}%</span>
+                  </div>
+                </div>
+              )}
+
               <div>
                 <h3 className="detail-section-title">Atualizar Status</h3>
                 <select
@@ -166,13 +181,11 @@ export function SaleDetailModal({
                   value={sale.status}
                   className="detail-status-select"
                 >
-                  <option value="pending">Pendente</option>
-                  <option value="in_progress">Em Andamento</option>
-                  <option value="stock_separated">Estoque Separado</option>
-                  <option value="dispatched">Despachado</option>
-                  <option value="installing">Instalando</option>
-                  <option value="active">Ativo</option>
-                  <option value="cancelled">Cancelado</option>
+                  {Object.entries(SALE_STATUS_LABELS).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>

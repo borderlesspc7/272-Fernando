@@ -39,6 +39,11 @@ export function SalesTable({
       { label: string; icon: typeof Clock; className: string }
     > = {
       pending: { label: "Pendente", icon: Clock, className: "status-pending" },
+      analyzing_stock: {
+        label: "Análise de Estoque",
+        icon: AlertCircle,
+        className: "status-pending",
+      },
       in_progress: {
         label: "Em Andamento",
         icon: AlertCircle,

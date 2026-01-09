@@ -109,6 +109,7 @@ export interface StockDispatch {
   // Despacho
   destination: string; // Endereço de destino
   dispatchDate: Date | Timestamp;
+  exitDate?: Date | Timestamp; // Data de saída efetiva do estoque
   dispatchedBy: string;
 
   // Responsável pela instalação
