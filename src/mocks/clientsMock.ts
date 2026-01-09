@@ -1,6 +1,4 @@
 import type { Client } from "../types/clients";
-import { Timestamp } from "firebase/firestore";
-
 // Mock de clientes com dados realistas
 export const mockClients: Client[] = [
   {
@@ -165,7 +163,8 @@ export const mockClients: Client[] = [
     createdAt: new Date("2023-12-20"),
     updatedAt: new Date("2024-01-01"),
     createdBy: "user-001",
-    notes: "Cliente premium com sistema completo de quadras. Contrato de 3 anos.",
+    notes:
+      "Cliente premium com sistema completo de quadras. Contrato de 3 anos.",
     tags: ["premium", "grande-contrato", "quadras"],
   },
   {
@@ -313,7 +312,8 @@ export const mockClients: Client[] = [
     createdAt: new Date("2022-12-15"),
     updatedAt: new Date("2023-01-01"),
     createdBy: "user-001",
-    notes: "Cliente público, contrato de 4 anos. Sistema completo com múltiplas quadras.",
+    notes:
+      "Cliente público, contrato de 4 anos. Sistema completo com múltiplas quadras.",
     tags: ["público", "grande-contrato", "quadras"],
   },
 ];
@@ -359,4 +359,3 @@ export const filterMockClients = (filters: {
 
   return filtered;
 };
-

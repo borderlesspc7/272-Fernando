@@ -1,6 +1,5 @@
 import type { Sale } from "../types/sales";
 import { AVAILABLE_PLANS } from "../types/sales";
-import { Timestamp } from "firebase/firestore";
 
 // Mock de vendas com dados realistas
 export const mockSales: Sale[] = [
@@ -220,7 +219,7 @@ export const mockSales: Sale[] = [
       totalValue: 449.8,
       installationFee: 149.9,
       firstPaymentDate: new Date("2024-01-01"),
-      paymentMethod: "bank_transfer",
+      paymentMethod: "bank_slip",
       paymentStatus: "paid",
     },
     status: "active",
@@ -323,10 +322,12 @@ export const mockSales: Sale[] = [
         description: "Sistema instalado e ativado com sucesso",
         createdAt: new Date("2024-01-03"),
         createdBy: "tech-002",
-        notes: "Instalação completa: 8 câmeras, 4 banners digitais e sistema de quadra",
+        notes:
+          "Instalação completa: 8 câmeras, 4 banners digitais e sistema de quadra",
       },
     ],
-    notes: "Instalação complexa com múltiplos equipamentos. Cliente muito satisfeito.",
+    notes:
+      "Instalação complexa com múltiplos equipamentos. Cliente muito satisfeito.",
     internalNotes: "Sistema de quadra requer manutenção trimestral.",
     createdAt: new Date("2023-12-20"),
     updatedAt: new Date("2024-01-03"),
@@ -379,7 +380,7 @@ export const mockSales: Sale[] = [
       totalValue: 229.8,
       installationFee: 79.9,
       firstPaymentDate: new Date("2024-02-01"),
-      paymentMethod: "bank_transfer",
+      paymentMethod: "bank_slip",
       paymentStatus: "paid",
     },
     status: "active",
@@ -810,4 +811,3 @@ export const filterMockSales = (filters: {
 
   return filtered;
 };
-

@@ -167,7 +167,9 @@ export const salesService = {
       const querySnapshot = await getDocs(q);
 
       if (querySnapshot.empty) {
-        console.log("Nenhuma venda encontrada no Firebase. Usando dados mockados.");
+        console.log(
+          "Nenhuma venda encontrada no Firebase. Usando dados mockados."
+        );
         return getMockSales();
       }
 
@@ -206,7 +208,9 @@ export const salesService = {
       const querySnapshot = await getDocs(q);
 
       if (querySnapshot.empty) {
-        console.log("Nenhuma venda encontrada no Firebase. Usando dados mockados.");
+        console.log(
+          "Nenhuma venda encontrada no Firebase. Usando dados mockados."
+        );
         return filterMockSales({
           status: filters.status,
           paymentStatus: filters.paymentStatus,
@@ -461,6 +465,7 @@ export const salesService = {
   getStatusDescription(status: Sale["status"]): string {
     const descriptions: Record<Sale["status"], string> = {
       pending: "Aguardando processamento",
+      analyzing_stock: "Análise de estoque e montagem",
       in_progress: "Venda em andamento",
       stock_separated: "Equipamentos separados no estoque",
       dispatched: "Equipamentos despachados para instalação",
