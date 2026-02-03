@@ -1,0 +1,132 @@
+/* ========== Container Principal ========== */
+.perfil-container {
+  padding: 32px;
+  position: relative;
+  min-height: calc(100vh - 64px);
+}
+
+/* ========== Título ========== */
+.perfil-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 32px;
+  color: #1a202c;
+  background-clip: text;
+}
+
+/* ========== Card Principal ========== */
+.perfil-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 40px;
+  max-width: 520px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  animation: perfilSlideUp 0.6s ease-out;
+}
+
+/* ========== Animação de Entrada ========== */
+@keyframes perfilSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========== Avatar ========== */
+.perfil-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 38px;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.45);
+  margin-bottom: 32px;
+  animation: scaleIn 0.5s ease-out;
+ 
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ========== Informações ========== */
+.perfil-info {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.perfil-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Label */
+.perfil-item .label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Valor */
+.perfil-item .value {
+  font-size: 15px;
+  color: #1e293b;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 18px;
+  transition: all 0.2s ease;
+}
+
+/* Hover sutil (consistência com login) */
+.perfil-item .value:hover {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* ========== Responsividade ========== */
+@media (max-width: 640px) {
+  .perfil-container {
+    padding: 24px 16px;
+  }
+
+  .perfil-title {
+    font-size: 28px;
+    margin-bottom: 24px;
+  }
+
+  .perfil-card {
+    padding: 32px 24px;
+    border-radius: 20px;
+  }
+
+  .perfil-avatar {
+    width: 72px;
+    height: 72px;
+    font-size: 32px;
+    border-radius: 20px;
+  }
+}

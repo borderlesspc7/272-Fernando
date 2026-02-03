@@ -11,4 +11,5 @@ export const paths = {
   technicians: "/tecnicos",
   occurrences: "/ocorrencias",
   reports: "/relatorios",
+  profile: "/profile",
 };

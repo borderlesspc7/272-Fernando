@@ -3,6 +3,7 @@ import { Bell, Search, Menu, User, LogOut } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import "./Header.css";
+import { paths } from "../../routes/paths";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -108,10 +109,17 @@ export function Header({ onMenuClick }: HeaderProps) {
               </div>
               <ul className="dropdown-list">
                 <li>
-                  <button className="dropdown-item">
+                  <button
+                    className="dropdown-item"
+                    onClick={() => {
+                      setShowUserMenu(false);
+                      navigate(paths.profile);
+                    }}
+                  >
                     <User size={20} />
-                    <span>Perfil</span>
+                    Perfil
                   </button>
+
                 </li>
                 <li className="divider"></li>
                 <li>
