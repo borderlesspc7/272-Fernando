@@ -3,8 +3,13 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  type Unsubscribe,
   onAuthStateChanged,
+  updateEmail,
+  updateProfile as updateFirebaseProfile,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updatePassword,
+  type Unsubscribe,
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import type {
@@ -45,13 +50,14 @@ export const authService = {
       }
 
       const userData = userDoc.data() as User;
-      const updateUserData = {
+
+      const updatedUser = {
         ...userData,
         lastLogin: new Date(),
       };
 
-      await setDoc(doc(db, "users", firebaseUser.uid), updateUserData);
-      return updateUserData;
+      await setDoc(doc(db, "users", firebaseUser.uid), updatedUser);
+      return updatedUser;
     } catch (error) {
       const message = getFirebaseErrorMessage(error as firebaseError | string);
       throw new Error(message);
@@ -60,19 +66,12 @@ export const authService = {
 
   async register(credentials: RegisterCredentials): Promise<User> {
     try {
-      if (!credentials.email || !credentials.password || !credentials.name) {
-        throw new Error("Todos os campos são obrigatórios");
-      }
-
-      if (credentials.password.length < 6) {
-        throw new Error("A senha deve ter pelo menos 6 caracteres");
-      }
-
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         credentials.email,
         credentials.password
       );
+
       const firebaseUser = userCredential.user;
 
       const newUser: User = {
@@ -80,9 +79,9 @@ export const authService = {
         name: credentials.name,
         email: credentials.email,
         phone: credentials.phone,
+        role: credentials.role || "user",
         createdAt: new Date(),
         updatedAt: new Date(),
-        role: credentials.role || "user",
       };
 
       await setDoc(doc(db, "users", firebaseUser.uid), newUser);
@@ -93,38 +92,77 @@ export const authService = {
     }
   },
 
-  observeAuthState(callback: (user: User | null) => void): Unsubscribe {
+  async updateProfile(data: { name?: string; email?: string }): Promise<User> {
     try {
-      return onAuthStateChanged(auth, async (firebaseUser) => {
-        console.log(
-          "🔄 Auth state changed:",
-          firebaseUser ? firebaseUser.uid : "null"
-        );
+      const firebaseUser = auth.currentUser;
+      if (!firebaseUser) throw new Error("Usuário não autenticado");
 
-        if (firebaseUser) {
-          // Usuário está logado, busca dados completos no Firestore
-          try {
-            const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
-            if (userDoc.exists()) {
-              const userData = userDoc.data() as User;
-              console.log("✅ Usuário autenticado:", userData);
-              callback(userData);
-            } else {
-              console.log("❌ Usuário não encontrado no Firestore");
-              callback(null); // Usuário não encontrado no Firestore
-            }
-          } catch (error) {
-            console.error("❌ Erro ao buscar dados do usuário:", error);
-            callback(null);
-          }
-        } else {
-          // Usuário não está logado
-          console.log("🚪 Usuário deslogado");
-          callback(null);
-        }
-      });
+      const userRef = doc(db, "users", firebaseUser.uid);
+      const userDoc = await getDoc(userRef);
+
+      if (!userDoc.exists()) {
+        throw new Error("Usuário não encontrado");
+      }
+
+      const currentData = userDoc.data() as User;
+
+      if (data.name) {
+        await updateFirebaseProfile(firebaseUser, {
+          displayName: data.name,
+        });
+      }
+
+      if (data.email && data.email !== currentData.email) {
+        await updateEmail(firebaseUser, data.email);
+      }
+
+      const updatedUser: User = {
+        ...currentData,
+        name: data.name ?? currentData.name,
+        email: data.email ?? currentData.email,
+        updatedAt: new Date(),
+      };
+
+      await setDoc(userRef, updatedUser);
+      return updatedUser;
     } catch (error) {
-      throw new Error("Erro ao observar estado de autenticação: " + error);
+      const message = getFirebaseErrorMessage(error as firebaseError | string);
+      throw new Error(message);
     }
+  },
+
+  async changePassword(
+    currentPassword: string,
+    newPassword: string
+  ): Promise<void> {
+    try {
+      const firebaseUser = auth.currentUser;
+      if (!firebaseUser || !firebaseUser.email) {
+        throw new Error("Usuário não autenticado");
+      }
+
+      const credential = EmailAuthProvider.credential(
+        firebaseUser.email,
+        currentPassword
+      );
+
+      await reauthenticateWithCredential(firebaseUser, credential);
+      await updatePassword(firebaseUser, newPassword);
+    } catch (error) {
+      const message = getFirebaseErrorMessage(error as firebaseError | string);
+      throw new Error(message);
+    }
+  },
+
+  observeAuthState(callback: (user: User | null) => void): Unsubscribe {
+    return onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!firebaseUser) {
+        callback(null);
+        return;
+      }
+
+      const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
+      callback(userDoc.exists() ? (userDoc.data() as User) : null);
+    });
   },
 };

@@ -16,6 +16,7 @@ import Occurrences from "../pages/Occurrences/Occurrences";
 import Technicians from "../pages/Technicians/Technicians";
 import Reports from "../pages/Reports/Reports";
 import Profile from "../pages/Profile/Page";
+import Configuration from "../pages/Configurations/Configuration";
 
 export function AppRoutes() {
   return (
@@ -121,6 +122,15 @@ export function AppRoutes() {
           element={
             <Layout>
               <Profile />
+            </Layout>
+          }
+        />
+
+        <Route
+          path="/configuracoes"
+          element={
+            <Layout>
+              <Configuration />
             </Layout>
           }
         />

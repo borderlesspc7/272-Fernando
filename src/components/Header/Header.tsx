@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bell, Search, Menu, User, LogOut } from "lucide-react";
+import { Bell, Search, Menu, User, LogOut, Wrench } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import "./Header.css";
@@ -118,6 +118,17 @@ export function Header({ onMenuClick }: HeaderProps) {
                   >
                     <User size={20} />
                     Perfil
+                  </button>
+
+                  <button
+                    className="dropdown-item"
+                    onClick={() => {
+                      setShowUserMenu(false);
+                      navigate(paths.settings);
+                    }}
+                  >
+                    <Wrench size={20} />
+                    Configurações
                   </button>
 
                 </li>

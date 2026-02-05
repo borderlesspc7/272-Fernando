@@ -16,10 +16,16 @@ interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (credentials: RegisterCredentials) => Promise<void>;
   logOut: () => Promise<void>;
+  changePassword: (
+    currentPassword: string,
+    newPassword: string
+  ) => Promise<void>;
   clearError: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(
+  undefined
+);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -27,15 +33,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("🔧 Configurando observer de autenticação");
     const unsubscribe = authService.observeAuthState((user) => {
       setUser(user);
       setLoading(false);
     });
 
-    return () => {
-      unsubscribe();
-    };
+    return () => unsubscribe();
   }, []);
 
   const login = async (credentials: LoginCredentials) => {
@@ -44,12 +47,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setError(null);
       const user = await authService.login(credentials);
       setUser(user);
-      setLoading(false);
     } catch (error) {
-      const message = getFirebaseErrorMessage(error as FirebaseError | string);
-      setError(message);
-      setLoading(false);
+      setError(
+        getFirebaseErrorMessage(error as FirebaseError | string)
+      );
       setUser(null);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,14 +62,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       setError(null);
       await authService.register(credentials);
-      // Não faz login automático - usuário precisa fazer login manualmente
       setUser(null);
-      setLoading(false);
     } catch (error) {
-      const message = getFirebaseErrorMessage(error as FirebaseError | string);
-      setError(message);
+      setError(
+        getFirebaseErrorMessage(error as FirebaseError | string)
+      );
+    } finally {
       setLoading(false);
-      setUser(null);
     }
   };
 
@@ -75,29 +78,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setError(null);
       await authService.logOut();
       setUser(null);
-      setLoading(false);
     } catch (error) {
-      const message = getFirebaseErrorMessage(error as FirebaseError | string);
-      setError(message);
+      setError(
+        getFirebaseErrorMessage(error as FirebaseError | string)
+      );
+    } finally {
       setLoading(false);
     }
   };
 
-  const clearError = () => {
-    setError(null);
+  const changePassword = async (
+    currentPassword: string,
+    newPassword: string
+  ) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await authService.changePassword(currentPassword, newPassword);
+    } catch (error) {
+      const message = getFirebaseErrorMessage(
+        error as FirebaseError | string
+      );
+      setError(message);
+      throw new Error(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const value = {
-    user,
-    loading,
-    error,
-    login,
-    register,
-    logOut,
-    clearError,
-  };
+  const clearError = () => setError(null);
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        error,
+        login,
+        register,
+        logOut,
+        changePassword,
+        clearError,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
-
-export { AuthContext };

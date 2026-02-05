@@ -12,4 +12,5 @@ export const paths = {
   occurrences: "/ocorrencias",
   reports: "/relatorios",
   profile: "/profile",
+  settings: "/configuracoes",
 };
