@@ -8,26 +8,41 @@ interface LayoutProps {
 }
 
 export function Layout({ children }: LayoutProps) {
+  // Estado real (persistente)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [isMobileSidebarMenuOpen, setIsMobileSidebarMenuOpen] = useState(false);
+
+  // Estado temporário (hover – só desktop)
+  const [isSidebarHovered, setIsSidebarHovered] = useState(false);
+
+  // Mobile
+  const [isMobileSidebarMenuOpen, setIsMobileSidebarMenuOpen] =
+    useState(false);
 
   const handleToggleSidebar = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed);
+    setIsSidebarCollapsed((prev) => !prev);
   };
 
   const handleMobileMenuClick = () => {
-    setIsMobileSidebarMenuOpen(!isMobileSidebarMenuOpen);
+    setIsMobileSidebarMenuOpen((prev) => !prev);
   };
+
+  // Sidebar visualmente expandida se:
+  // - não estiver colapsada
+  // - OU estiver em hover
+  const isSidebarExpanded = !isSidebarCollapsed || isSidebarHovered;
 
   return (
     <div className="layout">
       <Sidebar
-        isCollapsed={isSidebarCollapsed}
+        isCollapsed={!isSidebarExpanded}
         onToggle={handleToggleSidebar}
+        onMouseEnter={() => setIsSidebarHovered(true)}
+        onMouseLeave={() => setIsSidebarHovered(false)}
       />
+
       <div
         className={`layout-main ${
-          isSidebarCollapsed ? "sidebar-collapsed" : ""
+          !isSidebarExpanded ? "sidebar-collapsed" : ""
         }`}
       >
         <Header onMenuClick={handleMobileMenuClick} />
@@ -39,7 +54,7 @@ export function Layout({ children }: LayoutProps) {
         <div
           className="mobile-overlay"
           onClick={() => setIsMobileSidebarMenuOpen(false)}
-        ></div>
+        />
       )}
     </div>
   );

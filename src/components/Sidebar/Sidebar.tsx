@@ -18,7 +18,10 @@ import "./Sidebar.css";
 interface SidebarProps {
   isCollapsed: boolean;
   onToggle: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
+
 
 export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   const location = useLocation();
@@ -80,9 +83,12 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
           </div>
           {!isCollapsed && <span className="logo-text">Sistema Gestão</span>}
         </div>
-        <button className="toggle-button" onClick={onToggle}>
-          {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-        </button>
+
+        <div className="sidebar-toggle">
+          <button className="toggle-button" onClick={onToggle}>
+            {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+          </button>
+        </div>
       </div>
 
       <nav className="sidebar-nav">
