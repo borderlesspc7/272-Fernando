@@ -14,6 +14,7 @@ import {
   type QueryConstraint,
 } from "firebase/firestore";
 import { db } from "../lib/firebaseconfig";
+import { prepareForFirestore } from "../utils/firebaseHelpers";
 import type {
   Client,
   CreateClientData,
@@ -22,7 +23,6 @@ import type {
   PaginatedClients,
   ClientStats,
 } from "../types/clients";
-import { getMockClients, filterMockClients } from "../mocks/clientsMock";
 
 const CLIENTS_COLLECTION = "clients";
 
@@ -68,7 +68,10 @@ export const clientService = {
         updatedAt: now,
       };
 
-      await setDoc(clientRef, newClient);
+      // Remover campos undefined antes de salvar
+      const cleanedClient = prepareForFirestore(newClient);
+
+      await setDoc(clientRef, cleanedClient);
       return convertTimestampToDate(newClient);
     } catch (error) {
       console.error("Erro ao criar cliente:", error);
@@ -99,20 +102,12 @@ export const clientService = {
       const q = query(clientsRef, orderBy("createdAt", "desc"));
       const querySnapshot = await getDocs(q);
 
-      if (querySnapshot.empty) {
-        console.log(
-          "Nenhum cliente encontrado no Firebase. Usando dados mockados."
-        );
-        return getMockClients();
-      }
-
       return querySnapshot.docs.map((doc) =>
         convertTimestampToDate(doc.data() as Client)
       );
     } catch (error) {
       console.error("Erro ao buscar clientes:", error);
-      console.log("Usando dados mockados devido ao erro.");
-      return getMockClients();
+      throw new Error("Não foi possível buscar os clientes. Tente novamente.");
     }
   },
 
@@ -139,17 +134,6 @@ export const clientService = {
 
       const q = query(clientsRef, ...constraints);
       const querySnapshot = await getDocs(q);
-
-      if (querySnapshot.empty) {
-        console.log(
-          "Nenhum cliente encontrado no Firebase. Usando dados mockados."
-        );
-        return filterMockClients({
-          status: filters.status,
-          type: filters.type,
-          search: filters.search,
-        });
-      }
 
       let clients = querySnapshot.docs.map((doc) =>
         convertTimestampToDate(doc.data() as Client)
@@ -215,12 +199,7 @@ export const clientService = {
       return clients;
     } catch (error) {
       console.error("Erro ao buscar clientes com filtros:", error);
-      console.log("Usando dados mockados devido ao erro.");
-      return filterMockClients({
-        status: filters.status,
-        type: filters.type,
-        search: filters.search,
-      });
+      throw new Error("Não foi possível buscar os clientes. Tente novamente.");
     }
   },
 
@@ -292,7 +271,10 @@ export const clientService = {
         updatedAt: Timestamp.now(),
       };
 
-      await updateDoc(clientRef, updatedData);
+      // Remover campos undefined antes de atualizar
+      const cleanedData = prepareForFirestore(updatedData);
+
+      await updateDoc(clientRef, cleanedData);
 
       const updatedClientSnap = await getDoc(clientRef);
       return convertTimestampToDate(updatedClientSnap.data() as Client);

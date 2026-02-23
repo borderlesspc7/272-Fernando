@@ -1,6 +1,7 @@
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { Sidebar } from "../Sidebar/Sidebar";
 import { Header } from "../Header/Header";
+import GlobalSearch from "../GlobalSearch/GlobalSearch";
 import "./Layout.css";
 
 interface LayoutProps {
@@ -17,6 +18,22 @@ export function Layout({ children }: LayoutProps) {
   // Mobile
   const [isMobileSidebarMenuOpen, setIsMobileSidebarMenuOpen] =
     useState(false);
+
+  // Busca global
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+K ou Cmd+K para abrir busca
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleToggleSidebar = () => {
     setIsSidebarCollapsed((prev) => !prev);
@@ -45,7 +62,10 @@ export function Layout({ children }: LayoutProps) {
           !isSidebarExpanded ? "sidebar-collapsed" : ""
         }`}
       >
-        <Header onMenuClick={handleMobileMenuClick} />
+        <Header 
+          onMenuClick={handleMobileMenuClick}
+          onSearchClick={() => setIsSearchOpen(true)}
+        />
 
         <main className="layout-content">{children}</main>
       </div>
@@ -56,6 +76,11 @@ export function Layout({ children }: LayoutProps) {
           onClick={() => setIsMobileSidebarMenuOpen(false)}
         />
       )}
+
+      <GlobalSearch 
+        isOpen={isSearchOpen} 
+        onClose={() => setIsSearchOpen(false)} 
+      />
     </div>
   );
 }

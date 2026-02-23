@@ -45,8 +45,22 @@ export const authService = {
       const firebaseUser = userCredential.user;
       const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
 
+      // Se o usuário não existir no Firestore, criar automaticamente
       if (!userDoc.exists()) {
-        throw new Error("Usuário não encontrado");
+        console.log("Usuário não existe no Firestore, criando...");
+        const newUser: User = {
+          uid: firebaseUser.uid,
+          name: firebaseUser.displayName || firebaseUser.email?.split("@")[0] || "Usuário",
+          email: firebaseUser.email || credentials.email,
+          phone: firebaseUser.phoneNumber || "",
+          role: "user",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          lastLogin: new Date(),
+        };
+
+        await setDoc(doc(db, "users", firebaseUser.uid), newUser);
+        return newUser;
       }
 
       const userData = userDoc.data() as User;
@@ -59,6 +73,7 @@ export const authService = {
       await setDoc(doc(db, "users", firebaseUser.uid), updatedUser);
       return updatedUser;
     } catch (error) {
+      console.error("Erro no login:", error);
       const message = getFirebaseErrorMessage(error as firebaseError | string);
       throw new Error(message);
     }
@@ -66,11 +81,15 @@ export const authService = {
 
   async register(credentials: RegisterCredentials): Promise<User> {
     try {
+      console.log("Iniciando registro...", credentials.email);
+      
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         credentials.email,
         credentials.password
       );
+
+      console.log("Usuário criado no Authentication:", userCredential.user.uid);
 
       const firebaseUser = userCredential.user;
 
@@ -84,9 +103,15 @@ export const authService = {
         updatedAt: new Date(),
       };
 
+      console.log("Salvando usuário no Firestore...", newUser);
+      
       await setDoc(doc(db, "users", firebaseUser.uid), newUser);
+      
+      console.log("Usuário salvo com sucesso no Firestore!");
+      
       return newUser;
     } catch (error) {
+      console.error("Erro no registro:", error);
       const message = getFirebaseErrorMessage(error as firebaseError | string);
       throw new Error(message);
     }

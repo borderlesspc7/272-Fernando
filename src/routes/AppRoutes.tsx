@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { paths } from "./paths";
+import { ProtectedRoutes } from "./ProtectedRoutes";
 
 import { Layout } from "../components/Layout/Layout";
 
@@ -26,112 +27,136 @@ export function AppRoutes() {
         <Route path={paths.login} element={<Login />} />
         <Route path={paths.register} element={<Register />} />
 
-        {/* Rotas com layout */}
+        {/* Rotas protegidas com layout */}
         <Route
           path={paths.home}
           element={
-            <Layout>
-              <Dashboard />
-            </Layout>
+            <ProtectedRoutes>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </ProtectedRoutes>
           }
         />
 
         <Route
           path={paths.dashboard}
           element={
-            <Layout>
-              <Dashboard />
-            </Layout>
+            <ProtectedRoutes>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </ProtectedRoutes>
           }
         />
 
         <Route
           path={paths.clients}
           element={
-            <Layout>
-              <Clients />
-            </Layout>
+            <ProtectedRoutes>
+              <Layout>
+                <Clients />
+              </Layout>
+            </ProtectedRoutes>
           }
         />
 
         <Route
           path={paths.sales}
           element={
-            <Layout>
-              <Sales />
-            </Layout>
+            <ProtectedRoutes>
+              <Layout>
+                <Sales />
+              </Layout>
+            </ProtectedRoutes>
           }
         />
 
         <Route
           path={paths.stock}
           element={
-            <Layout>
-              <Stock />
-            </Layout>
+            <ProtectedRoutes>
+              <Layout>
+                <Stock />
+              </Layout>
+            </ProtectedRoutes>
           }
         />
 
         <Route
           path={paths.logistics}
           element={
-            <Layout>
-              <Logistics />
-            </Layout>
+            <ProtectedRoutes>
+              <Layout>
+                <Logistics />
+              </Layout>
+            </ProtectedRoutes>
           }
         />
 
         <Route
           path={paths.technicians}
           element={
-            <Layout>
-              <Technicians />
-            </Layout>
+            <ProtectedRoutes>
+              <Layout>
+                <Technicians />
+              </Layout>
+            </ProtectedRoutes>
           }
         />
 
         <Route
           path={paths.installations}
           element={
-            <Layout>
-              <Installations />
-            </Layout>
+            <ProtectedRoutes>
+              <Layout>
+                <Installations />
+              </Layout>
+            </ProtectedRoutes>
           }
         />
 
         <Route
           path={paths.occurrences}
           element={
-            <Layout>
-              <Occurrences />
-            </Layout>
+            <ProtectedRoutes>
+              <Layout>
+                <Occurrences />
+              </Layout>
+            </ProtectedRoutes>
           }
         />
 
         <Route
           path={paths.reports}
           element={
-            <Layout>
-              <Reports />
-            </Layout>
+            <ProtectedRoutes>
+              <Layout>
+                <Reports />
+              </Layout>
+            </ProtectedRoutes>
           }
         />
 
         <Route
           path={paths.profile}
           element={
-            <Layout>
-              <Profile />
-            </Layout>
+            <ProtectedRoutes>
+              <Layout>
+                <Profile />
+              </Layout>
+            </ProtectedRoutes>
           }
         />
 
         <Route
           path="/configuracoes"
           element={
-            <Layout>
-              <Configuration />
-            </Layout>
+            <ProtectedRoutes>
+              <Layout>
+                <Configuration />
+              </Layout>
+            </ProtectedRoutes>
           }
         />
       </Routes>

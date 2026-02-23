@@ -7,6 +7,8 @@ import { stockService } from "../../services/stockService";
 import { paths } from "../../routes/paths";
 import DashboardStats from "./components/DashboardStats";
 import DashboardQuickActions from "./components/DashboardQuickActions";
+import DashboardCharts from "./components/DashboardCharts";
+import { SkeletonStats } from "../../components/ui/Skeleton";
 import "./Dashboard.css";
 
 export default function Dashboard() {
@@ -81,14 +83,6 @@ export default function Dashboard() {
     // Trigger new occurrence modal - this would need to be handled by the Occurrences component
   };
 
-  if (loading) {
-    return (
-      <div className="dashboard-page">
-        <div className="dashboard-loading">Carregando...</div>
-      </div>
-    );
-  }
-
   return (
     <div className="dashboard-page">
       <div className="dashboard-header">
@@ -98,12 +92,19 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <DashboardStats stats={stats} />
+      {loading ? (
+        <SkeletonStats />
+      ) : (
+        <DashboardStats stats={stats} />
+      )}
+      
       <DashboardQuickActions
         onNewSale={handleNewSale}
         onNewClient={handleNewClient}
         onNewOccurrence={handleNewOccurrence}
       />
+
+      <DashboardCharts />
     </div>
   );
 }

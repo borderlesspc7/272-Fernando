@@ -7,9 +7,10 @@ import { paths } from "../../routes/paths";
 
 interface HeaderProps {
   onMenuClick: () => void;
+  onSearchClick?: () => void;
 }
 
-export function Header({ onMenuClick }: HeaderProps) {
+export function Header({ onMenuClick, onSearchClick }: HeaderProps) {
   const { user, logOut } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -37,12 +38,14 @@ export function Header({ onMenuClick }: HeaderProps) {
           <Menu size={20} />
         </button>
 
-        <div className="search-container">
+        <div className="search-container" onClick={onSearchClick} style={{ cursor: 'pointer' }}>
           <Search size={20} className="search-icon" />
           <input
             type="text"
-            placeholder="Buscar clientes, pedidos, equipamentos..."
+            placeholder="Buscar... (Ctrl+K)"
             className="search-input"
+            readOnly
+            onClick={onSearchClick}
           />
         </div>
       </div>
