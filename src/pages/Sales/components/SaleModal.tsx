@@ -1,10 +1,20 @@
 import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
-import type { CreateSaleData, Equipment, ContractType } from "../../../types/sales";
-import { AVAILABLE_PLANS, EQUIPMENT_TEMPLATES, CONTRACT_TYPE_LABELS, OFFER_CATEGORY_LABELS } from "../../../types/sales";
+import type {
+  CreateSaleData,
+  Equipment,
+  ContractType,
+} from "../../../types/sales";
+import {
+  AVAILABLE_PLANS,
+  CONTRACT_TYPE_LABELS,
+  OFFER_CATEGORY_LABELS,
+} from "../../../types/sales";
 import { salesService } from "../../../services/salesService";
 import { clientService } from "../../../services/clientsService";
+import { stockService } from "../../../services/stockService";
 import type { Client } from "../../../types/clients";
+import type { StockItem } from "../../../types/stock";
 import { X, Save, Loader2 } from "lucide-react";
 import "./SaleModal.css";
 
@@ -24,24 +34,59 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
   const [contractType, setContractType] = useState<ContractType>("simplified_adhesion");
   const [installationFee, setInstallationFee] = useState(0);
   const [notes, setNotes] = useState("");
+  const [stockItems, setStockItems] = useState<StockItem[]>([]);
+  const [selectedEquipments, setSelectedEquipments] = useState<Record<string, number>>({});
 
   useEffect(() => {
-    const loadClients = async () => {
+    const loadData = async () => {
       try {
-        const data = await clientService.getAllClients();
-        setClients(data.filter((c) => c.status === "active"));
+        const [clientsData, stockData] = await Promise.all([
+          clientService.getAllClients(),
+          stockService.getAllItems(),
+        ]);
+
+        setClients(clientsData.filter((c) => c.status === "active"));
+        setStockItems(
+          stockData.filter(
+            (item) => item.status === "available" && item.quantity > 0
+          )
+        );
       } catch (error) {
-        console.error("Erro ao carregar clientes:", error);
+        console.error("Erro ao carregar dados para venda:", error);
       }
     };
-    loadClients();
+
+    loadData();
   }, []);
+
+  const toggleEquipment = (itemId: string) => {
+    setSelectedEquipments((prev) => {
+      if (prev[itemId]) {
+        const { [itemId]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [itemId]: 1 };
+    });
+  };
+
+  const updateEquipmentQuantity = (itemId: string, quantity: number) => {
+    if (Number.isNaN(quantity) || quantity <= 0) quantity = 1;
+    setSelectedEquipments((prev) => ({
+      ...prev,
+      [itemId]: quantity,
+    }));
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!selectedClientId || !selectedPlanId) {
       setError("Selecione um cliente e um plano");
+      return;
+    }
+
+    if (Object.keys(selectedEquipments).length === 0) {
+      setError("Selecione pelo menos um equipamento do estoque");
       return;
     }
 
@@ -54,12 +99,23 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
 
       if (!client || !plan) return;
 
-      const equipments: Equipment[] = (
-        EQUIPMENT_TEMPLATES[selectedPlanId] || []
-      ).map((eq, index) => ({
-        ...eq,
-        id: `eq-${Date.now()}-${index}`,
-      }));
+      const equipments: Equipment[] = Object.entries(selectedEquipments).map(
+        ([itemId, quantity]) => {
+          const item = stockItems.find((i) => i.id === itemId);
+          if (!item) {
+            throw new Error("Item de estoque não encontrado");
+          }
+
+          return {
+            id: item.id,
+            name: item.name,
+            model: item.model,
+            type: (item.category as unknown) as Equipment["type"],
+            quantity,
+            status: "pending",
+          };
+        }
+      );
 
       const saleData: CreateSaleData = {
         clientId: client.id,
@@ -141,7 +197,9 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
                   }}
                 >
                   {plan.category && (
-                    <span className={`plan-category plan-category-${plan.category}`}>
+                    <span
+                      className={`plan-category plan-category-${plan.category}`}
+                    >
                       {OFFER_CATEGORY_LABELS[plan.category]}
                     </span>
                   )}
@@ -160,7 +218,9 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
             <div className="sale-form-group">
               <select
                 value={contractType}
-                onChange={(e) => setContractType(e.target.value as ContractType)}
+                onChange={(e) =>
+                  setContractType(e.target.value as ContractType)
+                }
                 required
               >
                 <option value="simplified_adhesion">
@@ -192,26 +252,79 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
               </div>
 
               <div className="sale-form-section">
-                <h3>Equipamentos Inclusos (Detalhamento)</h3>
+                <h3>Equipamentos do Estoque</h3>
                 <div className="equipment-list">
-                  {(EQUIPMENT_TEMPLATES[selectedPlanId] || []).map(
-                    (eq, index) => (
-                      <div key={index} className="equipment-item">
-                        <div className="equipment-info">
-                          <span className="equipment-name">
-                            {eq.name}
-                          </span>
-                          <span className="equipment-details">
-                            Modelo: {eq.model} | Qtd: {eq.quantity}
-                          </span>
-                          {eq.notes && (
-                            <span className="equipment-notes">
-                              {eq.notes}
+                  {stockItems.length === 0 ? (
+                    <p style={{ fontSize: "0.9rem", color: "#64748b" }}>
+                      Nenhum item de estoque disponível. Cadastre itens na tela
+                      de Estoque antes de criar a venda.
+                    </p>
+                  ) : (
+                    stockItems.map((item) => {
+                      const qty = selectedEquipments[item.id] || 0;
+                      const checked = qty > 0;
+                      return (
+                        <div key={item.id} className="equipment-item">
+                          <div className="equipment-info">
+                            <label
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "0.5rem",
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={() => toggleEquipment(item.id)}
+                              />
+                              <span className="equipment-name">
+                                {item.name}
+                              </span>
+                            </label>
+                            <span className="equipment-details">
+                              Modelo: {item.model} | Em estoque:{" "}
+                              {item.quantity}
                             </span>
-                          )}
+                            {checked && (
+                              <div
+                                style={{
+                                  marginTop: "0.5rem",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "0.5rem",
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    fontSize: "0.8rem",
+                                    color: "#64748b",
+                                  }}
+                                >
+                                  Qtd para esta venda:
+                                </span>
+                                <input
+                                  type="number"
+                                  min={1}
+                                  max={item.quantity}
+                                  value={qty || 1}
+                                  onChange={(e) =>
+                                    updateEquipmentQuantity(
+                                      item.id,
+                                      Number(e.target.value)
+                                    )
+                                  }
+                                  style={{
+                                    width: "80px",
+                                    padding: "0.25rem 0.5rem",
+                                  }}
+                                />
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    )
+                      );
+                    })
                   )}
                 </div>
               </div>

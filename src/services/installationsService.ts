@@ -10,6 +10,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../lib/firebaseconfig";
+import { prepareForFirestore } from "../utils/firebaseHelpers";
 import type {
   Installation,
   CreateInstallationData,
@@ -19,121 +20,6 @@ import type {
 } from "../types/installations";
 
 const COLLECTION = "installations";
-
-// Mock para visualização rápida
-const getMockInstallations = (): Installation[] => {
-  const now = new Date();
-  const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-  const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
-
-  return [
-    {
-      id: "inst-001",
-      saleId: "sale-001",
-      clientId: "client-001",
-      clientName: "João Silva",
-      clientPhone: "(11) 98765-4321",
-      clientAddress: "Rua das Flores, 123, Centro, São Paulo - SP",
-      technicianId: "tech-001",
-      technicianName: "Carlos Oliveira",
-      technicianPhone: "(11) 91234-5678",
-      status: "in_progress",
-      scheduledDate: twoDaysAgo,
-      startedAt: yesterday,
-      equipments: [
-        {
-          itemId: "item-001",
-          itemName: "Roteador Wi-Fi",
-          model: "TP-Link Archer C6",
-          serialNumber: "SN123456789",
-          quantity: 1,
-        },
-        {
-          itemId: "item-002",
-          itemName: "Antena Externa",
-          model: "Antena 15dBi",
-          serialNumber: "SN987654321",
-          quantity: 1,
-        },
-      ],
-      photos: [],
-      notes: "Cliente pede instalação em horário comercial",
-      createdAt: twoDaysAgo,
-      updatedAt: yesterday,
-      createdBy: "user-001",
-    },
-    {
-      id: "inst-002",
-      saleId: "sale-002",
-      clientId: "client-002",
-      clientName: "Maria Santos",
-      clientPhone: "(11) 97654-3210",
-      clientAddress: "Av. Paulista, 1000, São Paulo - SP",
-      technicianId: "tech-002",
-      technicianName: "Ana Paula",
-      technicianPhone: "(11) 92345-6789",
-      status: "pending",
-      scheduledDate: now,
-      equipments: [
-        {
-          itemId: "item-003",
-          itemName: "Roteador Wi-Fi",
-          model: "TP-Link Archer AX50",
-          serialNumber: "SN456789123",
-          quantity: 1,
-        },
-      ],
-      photos: [],
-      notes: "Instalação urgente",
-      createdAt: now,
-      updatedAt: now,
-      createdBy: "user-001",
-    },
-    {
-      id: "inst-003",
-      saleId: "sale-003",
-      clientId: "client-003",
-      clientName: "Pedro Costa",
-      clientPhone: "(11) 96543-2109",
-      clientAddress: "Rua Augusta, 500, São Paulo - SP",
-      technicianId: "tech-001",
-      technicianName: "Carlos Oliveira",
-      technicianPhone: "(11) 91234-5678",
-      status: "completed",
-      scheduledDate: twoDaysAgo,
-      startedAt: twoDaysAgo,
-      completedAt: yesterday,
-      equipments: [
-        {
-          itemId: "item-004",
-          itemName: "Roteador Wi-Fi",
-          model: "TP-Link Archer C7",
-          serialNumber: "SN789123456",
-          quantity: 1,
-        },
-        {
-          itemId: "item-005",
-          itemName: "Cabo de Rede",
-          model: "Cabo Cat6 50m",
-          quantity: 2,
-        },
-      ],
-      photos: [
-        {
-          id: "photo-1",
-          url: "https://storage.example.com/installations/inst-003/foto1.jpg",
-          description: "Roteador instalado",
-          uploadedAt: yesterday,
-          uploadedBy: "tech-001",
-        },
-      ],
-      notes: "Instalação concluída com sucesso",
-      createdAt: twoDaysAgo,
-      updatedAt: yesterday,
-      createdBy: "user-001",
-    },
-  ];
-};
 
 // Converter Timestamp para Date
 const convertTimestampToDate = <T extends Record<string, any>>(data: T): T => {
@@ -168,13 +54,15 @@ export const installationsService = {
       ...data,
       status: "pending",
       scheduledDate: Timestamp.fromDate(data.scheduledDate),
-      startedAt: undefined,
-      completedAt: undefined,
       photos: [],
       createdAt: now,
       updatedAt: now,
     };
-    await setDoc(ref, newInstallation);
+
+    // Remove campos undefined antes de salvar
+    const cleaned = prepareForFirestore(newInstallation);
+
+    await setDoc(ref, cleaned);
     return convertTimestampToDate(newInstallation);
   },
 
@@ -186,19 +74,12 @@ export const installationsService = {
   },
 
   async getAllInstallations(): Promise<Installation[]> {
-    try {
-      const ref = collection(db, COLLECTION);
-      const q = query(ref, orderBy("createdAt", "desc"));
-      const snap = await getDocs(q);
-      const data = snap.docs.map((d) =>
-        convertTimestampToDate(d.data() as Installation)
-      );
-      if (data.length === 0) return getMockInstallations();
-      return data;
-    } catch (err) {
-      console.error("Erro ao buscar instalações:", err);
-      return getMockInstallations(); // fallback para visualização
-    }
+    const ref = collection(db, COLLECTION);
+    const q = query(ref, orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+    return snap.docs.map((d) =>
+      convertTimestampToDate(d.data() as Installation)
+    );
   },
 
   async getInstallationsByFilters(
@@ -248,7 +129,10 @@ export const installationsService = {
     if (data.completedAt) {
       updates.completedAt = Timestamp.fromDate(data.completedAt);
     }
-    await updateDoc(ref, updates);
+
+    const cleaned = prepareForFirestore(updates);
+
+    await updateDoc(ref, cleaned);
   },
 
   async markAsCompleted(id: string): Promise<void> {

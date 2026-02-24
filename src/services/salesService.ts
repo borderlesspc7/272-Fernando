@@ -14,6 +14,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../lib/firebaseconfig";
 import { stockService } from "./stockService";
+import { installationsService } from "./installationsService";
 import { prepareForFirestore } from "../utils/firebaseHelpers";
 import type {
   Sale,
@@ -136,6 +137,45 @@ export const salesService = {
       } catch (stockError) {
         console.error("Erro ao criar ordem de separação:", stockError);
         // Não falha a venda se houver erro no estoque
+      }
+
+      // Criar instalação padrão automaticamente (D+1)
+      try {
+        const estimatedDate = new Date();
+        estimatedDate.setDate(estimatedDate.getDate() + 1);
+
+        await installationsService.createInstallation({
+          saleId: saleRef.id,
+          clientId: data.clientId,
+          clientName: data.clientName,
+          clientPhone: data.clientPhone || "",
+          clientAddress:
+            data.installationAddress?.street && data.installationAddress?.city
+              ? `${data.installationAddress.street}, ${
+                  data.installationAddress.number || ""
+                } - ${data.installationAddress.city} - ${
+                  data.installationAddress.state || ""
+                }`
+              : "",
+          technicianId: "",
+          technicianName: "",
+          technicianPhone: "",
+          status: "pending",
+          scheduledDate: estimatedDate,
+          equipments: data.equipments.map((eq) => ({
+            itemId: eq.id,
+            itemName: eq.name,
+            model: eq.model,
+            serialNumber: "",
+            quantity: eq.quantity,
+          })),
+          photos: [],
+          notes: "Instalação criada automaticamente a partir da venda.",
+          createdBy: data.createdBy,
+        });
+      } catch (installationError) {
+        console.error("Erro ao criar instalação automática:", installationError);
+        // Não falha a venda se houver erro na criação da instalação
       }
 
       return convertTimestampToDate(newSale);

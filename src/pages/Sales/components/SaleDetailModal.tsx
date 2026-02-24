@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Sale, SaleDocument } from "../../../types/sales";
 import { DOCUMENT_TYPE_LABELS, CONTRACT_TYPE_LABELS, OFFER_CATEGORY_LABELS, SALE_STATUS_LABELS } from "../../../types/sales";
 import { salesService } from "../../../services/salesService";
+import { pdfService } from "../../../services/pdfService";
 import { useAuth } from "../../../hooks/useAuth";
 import { X, Upload, FileText } from "lucide-react";
 import "./SaleDetailModal.css";
@@ -82,9 +83,32 @@ export function SaleDetailModal({
             <h2>Detalhes da Venda</h2>
             <p className="detail-modal-sale-id">#{sale.id.slice(0, 12)}</p>
           </div>
-          <button className="detail-modal-close" onClick={onClose}>
-            <X size={24} />
-          </button>
+
+          <div className="detail-modal-header-actions">
+            <button
+              type="button"
+              className="detail-header-button"
+              title="Gerar Proposta em PDF"
+              onClick={() => pdfService.generateProposal(sale)}
+            >
+              <FileText size={18} />
+              <span>Proposta</span>
+            </button>
+
+            <button
+              type="button"
+              className="detail-header-button"
+              title="Gerar Contrato em PDF"
+              onClick={() => pdfService.generateContract(sale)}
+            >
+              <FileText size={18} />
+              <span>Contrato</span>
+            </button>
+
+            <button className="detail-modal-close" onClick={onClose}>
+              <X size={24} />
+            </button>
+          </div>
         </div>
 
         <div className="detail-modal-tabs">

@@ -250,8 +250,9 @@
   padding: 1.5rem 2rem;
   border-top: 1px solid var(--border-color);
   display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
+  flex-direction: column-reverse;
+  align-items: stretch;
+  gap: 0.75rem;
   position: sticky;
   bottom: 0;
   background: white;
@@ -259,7 +260,7 @@
 
 .sale-btn-secondary,
 .sale-btn-submit {
-  padding: 0.75rem 1.5rem;
+  padding: 0.9rem 1.5rem;
   border-radius: 12px;
   font-weight: 600;
   font-size: 0.95rem;
@@ -269,6 +270,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  justify-content: center;
 }
 
 .sale-btn-secondary {
@@ -281,8 +283,10 @@
 }
 
 .sale-btn-submit {
-  background: var(--primary-color);
-  color: white;
+  background: #111827 !important; /* preto quase */
+  color: #ffffff !important;      /* texto branco forte */
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  border: 1px solid #000000 !important;
 }
 
 .sale-btn-submit:hover:not(:disabled) {
