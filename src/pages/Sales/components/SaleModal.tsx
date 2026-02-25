@@ -6,17 +6,19 @@ import type {
   ContractType,
 } from "../../../types/sales";
 import {
-  AVAILABLE_PLANS,
   CONTRACT_TYPE_LABELS,
   OFFER_CATEGORY_LABELS,
+  type Plan,
 } from "../../../types/sales";
 import { salesService } from "../../../services/salesService";
 import { clientService } from "../../../services/clientsService";
 import { stockService } from "../../../services/stockService";
+import { plansService } from "../../../services/plansService";
 import type { Client } from "../../../types/clients";
 import type { StockItem } from "../../../types/stock";
 import { X, Save, Loader2 } from "lucide-react";
 import "./SaleModal.css";
+import { useAuth } from "../../../hooks/useAuth";
 
 interface SaleModalProps {
   onClose: () => void;
@@ -28,11 +30,15 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const { user } = useAuth();
+
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClientId, setSelectedClientId] = useState("");
+  const [plans, setPlans] = useState<Plan[]>([]);
   const [selectedPlanId, setSelectedPlanId] = useState("");
   const [contractType, setContractType] = useState<ContractType>("simplified_adhesion");
   const [installationFee, setInstallationFee] = useState(0);
+  const [monthlyValue, setMonthlyValue] = useState(0);
   const [notes, setNotes] = useState("");
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
   const [selectedEquipments, setSelectedEquipments] = useState<Record<string, number>>({});
@@ -40,9 +46,10 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [clientsData, stockData] = await Promise.all([
+        const [clientsData, stockData, plansData] = await Promise.all([
           clientService.getAllClients(),
           stockService.getAllItems(),
+          plansService.getAllPlans({ onlyActive: true }),
         ]);
 
         setClients(clientsData.filter((c) => c.status === "active"));
@@ -51,6 +58,7 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
             (item) => item.status === "available" && item.quantity > 0
           )
         );
+        setPlans(plansData);
       } catch (error) {
         console.error("Erro ao carregar dados para venda:", error);
       }
@@ -58,6 +66,14 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
 
     loadData();
   }, []);
+
+  useEffect(() => {
+    const plan = plans.find((p) => p.id === selectedPlanId);
+    if (plan) {
+      setMonthlyValue(plan.value);
+      setInstallationFee(plan.installationFee || 0);
+    }
+  }, [selectedPlanId, plans]);
 
   const toggleEquipment = (itemId: string) => {
     setSelectedEquipments((prev) => {
@@ -95,7 +111,7 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
       setError("");
 
       const client = clients.find((c) => c.id === selectedClientId);
-      const plan = AVAILABLE_PLANS.find((p) => p.id === selectedPlanId);
+      const plan = plans.find((p) => p.id === selectedPlanId);
 
       if (!client || !plan) return;
 
@@ -124,7 +140,7 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
         contractType,
         equipments,
         payment: {
-          totalValue: plan.value + installationFee,
+          totalValue: monthlyValue + installationFee,
           installationFee,
           paymentStatus: "pending",
         },
@@ -142,7 +158,7 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
     }
   };
 
-  const selectedPlan = AVAILABLE_PLANS.find((p) => p.id === selectedPlanId);
+  const selectedPlan = plans.find((p) => p.id === selectedPlanId);
 
   return (
     <div className="sale-modal-overlay" onClick={onClose}>
@@ -185,7 +201,7 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
           <div className="sale-form-section">
             <h3>Escolher Plano (Categoria de Oferta)</h3>
             <div className="plan-cards-grid">
-              {AVAILABLE_PLANS.map((plan) => (
+              {plans.map((plan) => (
                 <div
                   key={plan.id}
                   className={`plan-card ${
@@ -193,7 +209,6 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
                   }`}
                   onClick={() => {
                     setSelectedPlanId(plan.id);
-                    setInstallationFee(plan.installationFee || 0);
                   }}
                 >
                   {plan.category && (
@@ -239,15 +254,65 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
           {selectedPlan && (
             <>
               <div className="sale-form-section">
-                <h3>Taxa de Instalação</h3>
-                <div className="sale-form-group">
-                  <input
-                    type="number"
-                    value={installationFee}
-                    onChange={(e) => setInstallationFee(Number(e.target.value))}
-                    step="0.01"
-                    min="0"
-                  />
+                <h3>Valores e Descontos</h3>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "1rem",
+                  }}
+                >
+                  <div className="sale-form-group">
+                    <label>Mensalidade (após desconto)</label>
+                    <input
+                      type="number"
+                      value={monthlyValue}
+                      min={0}
+                      step="0.01"
+                      onChange={(e) => {
+                        if (!selectedPlan) return;
+                        const base = selectedPlan.value;
+                        const value = Number(e.target.value);
+                        const discountPercent =
+                          base > 0 ? (1 - value / base) * 100 : 0;
+
+                        if (
+                          selectedPlan.maxDiscountPercent &&
+                          !user?.role !== "admin" &&
+                          discountPercent >
+                            (selectedPlan.maxDiscountPercent || 0)
+                        ) {
+                          alert(
+                            `Desconto máximo permitido para este plano é de ${selectedPlan.maxDiscountPercent}%`
+                          );
+                          setMonthlyValue(base);
+                          return;
+                        }
+
+                        setMonthlyValue(value);
+                      }}
+                    />
+                    {selectedPlan?.maxDiscountPercent && (
+                      <small style={{ color: "#64748b" }}>
+                        Desconto máximo sem aprovação:{" "}
+                        {selectedPlan.maxDiscountPercent}% (admin ignora
+                        limite)
+                      </small>
+                    )}
+                  </div>
+
+                  <div className="sale-form-group">
+                    <label>Taxa de Instalação</label>
+                    <input
+                      type="number"
+                      value={installationFee}
+                      onChange={(e) =>
+                        setInstallationFee(Number(e.target.value))
+                      }
+                      step="0.01"
+                      min="0"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -344,7 +409,7 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
               <div className="sale-summary">
                 <div className="summary-row">
                   <span>Plano Mensal:</span>
-                  <strong>R$ {selectedPlan.value.toFixed(2)}</strong>
+                  <strong>R$ {monthlyValue.toFixed(2)}</strong>
                 </div>
                 <div className="summary-row">
                   <span>Taxa de Instalação:</span>

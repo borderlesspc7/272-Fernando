@@ -33,6 +33,8 @@ export interface Plan {
   installationFee?: number;
   features?: string[];
   category?: OfferCategory; // Categoria da oferta (básico, intermediário, prêmio)
+  maxDiscountPercent?: number; // Desconto máximo permitido (ex: 20 = 20%)
+  isActive?: boolean; // Se o plano está ativo para venda
 }
 
 // Tipo de equipamento

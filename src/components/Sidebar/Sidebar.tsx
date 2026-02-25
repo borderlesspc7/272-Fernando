@@ -48,6 +48,11 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       label: "Estoque",
     },
     {
+      path: "/financeiro",
+      icon: BarChart3,
+      label: "Financeiro",
+    },
+    {
       path: "/logistica",
       icon: Truck,
       label: "Logística",

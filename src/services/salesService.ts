@@ -15,6 +15,7 @@ import {
 import { db } from "../lib/firebaseconfig";
 import { stockService } from "./stockService";
 import { installationsService } from "./installationsService";
+import { billingService } from "./billingService";
 import { prepareForFirestore } from "../utils/firebaseHelpers";
 import type {
   Sale,
@@ -176,6 +177,27 @@ export const salesService = {
       } catch (installationError) {
         console.error("Erro ao criar instalação automática:", installationError);
         // Não falha a venda se houver erro na criação da instalação
+      }
+
+      // Criar primeira fatura (financeiro)
+      try {
+        const dueDate =
+          data.payment.firstPaymentDate instanceof Date
+            ? data.payment.firstPaymentDate
+            : new Date(new Date().setDate(new Date().getDate() + 7));
+
+        await billingService.createInvoice({
+          saleId: saleRef.id,
+          clientId: data.clientId,
+          clientName: data.clientName,
+          description: `Assinatura do plano ${data.plan.name}`,
+          amount: data.payment.totalValue,
+          dueDate,
+          createdBy: data.createdBy,
+        });
+      } catch (billingError) {
+        console.error("Erro ao criar fatura inicial:", billingError);
+        // Não falha a venda se houver erro no financeiro
       }
 
       return convertTimestampToDate(newSale);

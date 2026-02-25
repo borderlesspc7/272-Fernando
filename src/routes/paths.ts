@@ -7,6 +7,7 @@ export const paths = {
   sales: "/vendas",
   installations: "/instalacoes",
   stock: "/estoque",
+  finance: "/financeiro",
   logistics: "/logistica",
   technicians: "/tecnicos",
   occurrences: "/ocorrencias",
