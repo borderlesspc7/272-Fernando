@@ -5,17 +5,14 @@ import type {
   Equipment,
   ContractType,
 } from "../../../types/sales";
-import {
-  CONTRACT_TYPE_LABELS,
-  OFFER_CATEGORY_LABELS,
-  type Plan,
-} from "../../../types/sales";
+import { CONTRACT_TYPE_LABELS, type Plan } from "../../../types/sales";
 import { salesService } from "../../../services/salesService";
 import { clientService } from "../../../services/clientsService";
 import { stockService } from "../../../services/stockService";
-import { plansService } from "../../../services/plansService";
+import { techniciansService } from "../../../services/techniciansService";
 import type { Client } from "../../../types/clients";
 import type { StockItem } from "../../../types/stock";
+import type { Technician } from "../../../types/technicians";
 import { X, Save, Loader2 } from "lucide-react";
 import "./SaleModal.css";
 import { useAuth } from "../../../hooks/useAuth";
@@ -34,31 +31,35 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
 
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClientId, setSelectedClientId] = useState("");
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [selectedPlanId, setSelectedPlanId] = useState("");
   const [contractType, setContractType] = useState<ContractType>("simplified_adhesion");
   const [installationFee, setInstallationFee] = useState(0);
   const [monthlyValue, setMonthlyValue] = useState(0);
   const [notes, setNotes] = useState("");
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
   const [selectedEquipments, setSelectedEquipments] = useState<Record<string, number>>({});
+  const [technicians, setTechnicians] = useState<Technician[]>([]);
+  const [selectedTechnicianId, setSelectedTechnicianId] = useState("");
+  const [installationDate, setInstallationDate] = useState<string>("");
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [clientsData, stockData, plansData] = await Promise.all([
+        const [clientsData, stockData, techniciansData] = await Promise.all([
           clientService.getAllClients(),
           stockService.getAllItems(),
-          plansService.getAllPlans({ onlyActive: true }),
+          techniciansService.getAllTechnicians(),
         ]);
 
-        setClients(clientsData.filter((c) => c.status === "active"));
+        // Para venda, exibimos todos os clientes que não estão bloqueados
+        setClients(
+          clientsData.filter((c) => c.status !== "blocked")
+        );
         setStockItems(
           stockData.filter(
             (item) => item.status === "available" && item.quantity > 0
           )
         );
-        setPlans(plansData);
+        setTechnicians(techniciansData.filter((t) => t.status === "active"));
       } catch (error) {
         console.error("Erro ao carregar dados para venda:", error);
       }
@@ -67,13 +68,7 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
     loadData();
   }, []);
 
-  useEffect(() => {
-    const plan = plans.find((p) => p.id === selectedPlanId);
-    if (plan) {
-      setMonthlyValue(plan.value);
-      setInstallationFee(plan.installationFee || 0);
-    }
-  }, [selectedPlanId, plans]);
+  // Valores podem ser definidos livremente, sem depender de planos cadastrados
 
   const toggleEquipment = (itemId: string) => {
     setSelectedEquipments((prev) => {
@@ -96,8 +91,18 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (!selectedClientId || !selectedPlanId) {
-      setError("Selecione um cliente e um plano");
+    if (!selectedClientId) {
+      setError("Selecione um cliente");
+      return;
+    }
+
+    if (!installationDate) {
+      setError("Defina a data de instalação");
+      return;
+    }
+
+    if (!selectedTechnicianId) {
+      setError("Selecione o técnico responsável");
       return;
     }
 
@@ -111,9 +116,19 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
       setError("");
 
       const client = clients.find((c) => c.id === selectedClientId);
-      const plan = plans.find((p) => p.id === selectedPlanId);
+      const technician = technicians.find(
+        (t) => t.id === selectedTechnicianId
+      );
 
-      if (!client || !plan) return;
+      if (!client || !technician) return;
+
+      // Criamos um \"plano\" genérico apenas para preencher o tipo da venda.
+      const plan: Plan = {
+        id: "custom-plan",
+        name: "Serviço personalizado",
+        value: monthlyValue,
+        installationFee,
+      };
 
       const equipments: Equipment[] = Object.entries(selectedEquipments).map(
         ([itemId, quantity]) => {
@@ -136,6 +151,7 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
       const saleData: CreateSaleData = {
         clientId: client.id,
         clientName: client.name,
+        clientPhone: client.phone,
         plan,
         contractType,
         equipments,
@@ -145,6 +161,9 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
           paymentStatus: "pending",
         },
         installationAddress: client.addresses[0],
+        estimatedInstallationDate: new Date(installationDate),
+        technicianId: technician.id,
+        technicianName: technician.name,
         notes,
         createdBy,
       };
@@ -157,8 +176,6 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
       setLoading(false);
     }
   };
-
-  const selectedPlan = plans.find((p) => p.id === selectedPlanId);
 
   return (
     <div className="sale-modal-overlay" onClick={onClose}>
@@ -199,34 +216,42 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
           </div>
 
           <div className="sale-form-section">
-            <h3>Escolher Plano (Categoria de Oferta)</h3>
-            <div className="plan-cards-grid">
-              {plans.map((plan) => (
-                <div
-                  key={plan.id}
-                  className={`plan-card ${
-                    selectedPlanId === plan.id ? "selected" : ""
-                  }`}
-                  onClick={() => {
-                    setSelectedPlanId(plan.id);
-                  }}
+            <h3>Definir Técnico e Data de Instalação</h3>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "2fr 1fr",
+                gap: "1rem",
+              }}
+            >
+              <div className="sale-form-group">
+                <label>Técnico Responsável</label>
+                <select
+                  value={selectedTechnicianId}
+                  onChange={(e) => setSelectedTechnicianId(e.target.value)}
+                  required
                 >
-                  {plan.category && (
-                    <span
-                      className={`plan-category plan-category-${plan.category}`}
-                    >
-                      {OFFER_CATEGORY_LABELS[plan.category]}
-                    </span>
-                  )}
-                  <h4 className="plan-card-name">{plan.name}</h4>
-                  <p className="plan-card-description">{plan.description}</p>
-                  <p className="plan-card-price">
-                    R$ {plan.value.toFixed(2)}/mês
-                  </p>
-                </div>
-              ))}
+                  <option value="">Selecione um técnico...</option>
+                  {technicians.map((tech) => (
+                    <option key={tech.id} value={tech.id}>
+                      {tech.name} - {tech.region.toUpperCase()}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="sale-form-group">
+                <label>Data de Instalação</label>
+                <input
+                  type="date"
+                  value={installationDate}
+                  onChange={(e) => setInstallationDate(e.target.value)}
+                  required
+                />
+              </div>
             </div>
           </div>
+
+          {/* Removida a escolha de plano: valores são definidos manualmente */}
 
           <div className="sale-form-section">
             <h3>Forma de Contratação</h3>
@@ -251,9 +276,7 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
             </div>
           </div>
 
-          {selectedPlan && (
-            <>
-              <div className="sale-form-section">
+          <div className="sale-form-section">
                 <h3>Valores e Descontos</h3>
                 <div
                   style={{
@@ -263,42 +286,14 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
                   }}
                 >
                   <div className="sale-form-group">
-                    <label>Mensalidade (após desconto)</label>
+                    <label>Mensalidade (valor do serviço)</label>
                     <input
                       type="number"
                       value={monthlyValue}
                       min={0}
                       step="0.01"
-                      onChange={(e) => {
-                        if (!selectedPlan) return;
-                        const base = selectedPlan.value;
-                        const value = Number(e.target.value);
-                        const discountPercent =
-                          base > 0 ? (1 - value / base) * 100 : 0;
-
-                        if (
-                          selectedPlan.maxDiscountPercent &&
-                          !user?.role !== "admin" &&
-                          discountPercent >
-                            (selectedPlan.maxDiscountPercent || 0)
-                        ) {
-                          alert(
-                            `Desconto máximo permitido para este plano é de ${selectedPlan.maxDiscountPercent}%`
-                          );
-                          setMonthlyValue(base);
-                          return;
-                        }
-
-                        setMonthlyValue(value);
-                      }}
+                      onChange={(e) => setMonthlyValue(Number(e.target.value))}
                     />
-                    {selectedPlan?.maxDiscountPercent && (
-                      <small style={{ color: "#64748b" }}>
-                        Desconto máximo sem aprovação:{" "}
-                        {selectedPlan.maxDiscountPercent}% (admin ignora
-                        limite)
-                      </small>
-                    )}
                   </div>
 
                   <div className="sale-form-group">
@@ -418,12 +413,10 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
                 <div className="summary-total">
                   <span className="summary-total-label">Total Inicial:</span>
                   <span className="summary-total-value">
-                    R$ {(selectedPlan.value + installationFee).toFixed(2)}
+                    R$ {(monthlyValue + installationFee).toFixed(2)}
                   </span>
                 </div>
               </div>
-            </>
-          )}
 
           <div className="sale-modal-footer">
             <button

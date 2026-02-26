@@ -7,7 +7,6 @@ import {
   updateDoc,
   deleteDoc,
   query,
-  where,
   orderBy,
 } from "firebase/firestore";
 import { db } from "../lib/firebaseconfig";
@@ -48,23 +47,24 @@ export const plansService = {
     return snap.data() as Plan;
   },
 
-  async getAllPlans(options?: { onlyActive?: boolean; category?: OfferCategory }): Promise<Plan[]> {
+  async getAllPlans(options?: {
+    onlyActive?: boolean;
+    category?: OfferCategory;
+  }): Promise<Plan[]> {
     const ref = collection(db, COLLECTION);
-    const constraints = [];
+    // Busca todos ordenados por valor e filtra em memória para não precisar de índice composto
+    const q = query(ref, orderBy("value", "asc"));
+    const snap = await getDocs(q);
+    let plans = snap.docs.map((d) => d.data() as Plan);
 
     if (options?.onlyActive) {
-      constraints.push(where("isActive", "==", true));
+      plans = plans.filter((p) => p.isActive !== false);
     }
     if (options?.category) {
-      constraints.push(where("category", "==", options.category));
+      plans = plans.filter((p) => p.category === options.category);
     }
 
-    const q = constraints.length
-      ? query(ref, ...constraints, orderBy("value", "asc"))
-      : query(ref, orderBy("value", "asc"));
-
-    const snap = await getDocs(q);
-    return snap.docs.map((d) => d.data() as Plan);
+    return plans;
   },
 };
 

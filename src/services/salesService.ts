@@ -140,10 +140,10 @@ export const salesService = {
         // Não falha a venda se houver erro no estoque
       }
 
-      // Criar instalação padrão automaticamente (D+1)
+      // Criar instalação de acordo com data e técnico escolhidos na venda
       try {
-        const estimatedDate = new Date();
-        estimatedDate.setDate(estimatedDate.getDate() + 1);
+        const estimatedDate =
+          data.estimatedInstallationDate || new Date();
 
         await installationsService.createInstallation({
           saleId: saleRef.id,
@@ -158,8 +158,8 @@ export const salesService = {
                   data.installationAddress.state || ""
                 }`
               : "",
-          technicianId: "",
-          technicianName: "",
+          technicianId: data.technicianId,
+          technicianName: data.technicianName,
           technicianPhone: "",
           status: "pending",
           scheduledDate: estimatedDate,

@@ -120,6 +120,10 @@ export interface Sale {
   // Progresso da instalação (0-100%)
   progress?: number;
 
+  // Técnico responsável (opcional)
+  technicianId?: string;
+  technicianName?: string;
+
   // Endereço de instalação
   installationAddress: {
     street: string;
@@ -161,12 +165,15 @@ export interface Sale {
 export interface CreateSaleData {
   clientId: string;
   clientName: string;
+  clientPhone?: string;
   plan: Plan;
   contractType?: ContractType;
   equipments: Equipment[];
   payment: Payment;
   installationAddress: Sale["installationAddress"];
   estimatedInstallationDate?: Date;
+  technicianId?: string;
+  technicianName?: string;
   notes?: string;
   createdBy: string;
 }
