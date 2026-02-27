@@ -1,0 +1,16 @@
+.history-page {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.history-page .page-header h1 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.history-page .page-description {
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}

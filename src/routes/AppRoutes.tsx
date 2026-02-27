@@ -11,10 +11,9 @@ import Dashboard from "../pages/Dashboard/Dashboard";
 import { Clients } from "../pages/Clients/Clients";
 import { Sales } from "../pages/Sales/Sales";
 import { Stock } from "../pages/Stock/Stock";
-import { Finance } from "../pages/Finance/Finance";
-import { Logistics } from "../pages/Logistics/Logistics";
 import { Installations } from "../pages/Installations/Installations";
 import Occurrences from "../pages/Occurrences/Occurrences";
+import { History } from "../pages/History/History";
 import Technicians from "../pages/Technicians/Technicians";
 import Reports from "../pages/Reports/Reports";
 import Profile from "../pages/Profile/Page";
@@ -85,22 +84,11 @@ export function AppRoutes() {
         />
 
         <Route
-          path={paths.finance}
+          path={paths.history}
           element={
             <ProtectedRoutes>
               <Layout>
-                <Finance />
-              </Layout>
-            </ProtectedRoutes>
-          }
-        />
-
-        <Route
-          path={paths.logistics}
-          element={
-            <ProtectedRoutes>
-              <Layout>
-                <Logistics />
+                <History />
               </Layout>
             </ProtectedRoutes>
           }

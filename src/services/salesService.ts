@@ -383,6 +383,39 @@ export const salesService = {
         timeline: [...sale.timeline, newEvent],
         updatedAt: Timestamp.now(),
       });
+
+      // Se a venda foi concluída / em instalação / ativa, apenas garante que a ordem de separação
+      // seja marcada como despachada. A lógica de baixa de estoque fica centralizada no estoque.
+      const completedStatuses = ["dispatched", "installing", "active"];
+      if (completedStatuses.includes(status)) {
+        try {
+          await stockService.updateSeparationOrderStatusBySaleId(
+            saleId,
+            "dispatched"
+          );
+        } catch (orderError) {
+          console.error(
+            "Erro ao atualizar ordem de separação ao concluir venda:",
+            orderError
+          );
+          // Não lança erro para não travar atualização da venda
+        }
+      }
+
+      // Se a venda foi cancelada, atualizar ordem de separação para cancelada
+      if (status === "cancelled") {
+        try {
+          await stockService.updateSeparationOrderStatusBySaleId(
+            saleId,
+            "cancelled"
+          );
+        } catch (cancelError) {
+          console.error(
+            "Erro ao cancelar ordem de separação:",
+            cancelError
+          );
+        }
+      }
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
       throw new Error(

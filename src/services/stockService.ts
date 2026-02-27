@@ -422,6 +422,18 @@ export const stockService = {
     }
   },
 
+  async hasDispatchForSale(saleId: string): Promise<boolean> {
+    try {
+      const dispatchesRef = collection(db, STOCK_DISPATCHES_COLLECTION);
+      const q = query(dispatchesRef, where("saleId", "==", saleId));
+      const snap = await getDocs(q);
+      return !snap.empty;
+    } catch (error) {
+      console.error("Erro ao verificar despachos da venda:", error);
+      return false;
+    }
+  },
+
   // ========== SEPARATION ORDERS ==========
   async createSeparationOrder(
     saleId: string,
@@ -477,6 +489,18 @@ export const stockService = {
     }
   },
 
+  async getSeparationOrdersHistory(): Promise<SeparationOrder[]> {
+    try {
+      const orders = await this.getSeparationOrders();
+      return orders.filter(
+        (o) => o.status === "dispatched" || o.status === "cancelled"
+      );
+    } catch (error) {
+      console.error("Erro ao buscar histórico de ordens:", error);
+      throw new Error("Não foi possível buscar o histórico.");
+    }
+  },
+
   async updateSeparationOrderStatus(
     orderId: string,
     status: SeparationOrder["status"],
@@ -484,6 +508,14 @@ export const stockService = {
   ): Promise<void> {
     try {
       const orderRef = doc(db, SEPARATION_ORDERS_COLLECTION, orderId);
+      const orderSnap = await getDoc(orderRef);
+
+      if (!orderSnap.exists()) {
+        throw new Error("Ordem de separação não encontrada");
+      }
+
+      const order = orderSnap.data() as SeparationOrder;
+
       const updates: any = {
         status,
       };
@@ -497,10 +529,67 @@ export const stockService = {
         updates.completedAt = Timestamp.now();
       }
 
+      if (status === "dispatched" || status === "cancelled") {
+        updates.completedAt = Timestamp.now();
+      }
+
       await updateDoc(orderRef, updates);
+
+      // Quando a ordem for despachada, dar baixa no estoque (uma vez só)
+      if (status === "dispatched") {
+        try {
+          const alreadyDispatched = await this.hasDispatchForSale(order.saleId);
+
+          if (!alreadyDispatched) {
+            await this.createDispatch({
+              items: order.items.map((item) => ({
+                itemId: item.itemId,
+                quantity: item.quantity,
+              })),
+              saleId: order.saleId,
+              clientId: order.clientId,
+              destination: order.clientName,
+              dispatchDate: new Date(),
+              technician: undefined,
+              technicianContact: undefined,
+              notes: "Despacho automático ao marcar ordem como despachada",
+              createdBy: userId,
+            });
+          }
+        } catch (dispatchError) {
+          console.error(
+            "Erro ao criar despacho automático da ordem:",
+            dispatchError
+          );
+          // Não lança erro para não travar atualização da ordem
+        }
+      }
     } catch (error) {
       console.error("Erro ao atualizar ordem:", error);
       throw new Error("Não foi possível atualizar a ordem.");
+    }
+  },
+
+  async updateSeparationOrderStatusBySaleId(
+    saleId: string,
+    status: "dispatched" | "cancelled"
+  ): Promise<void> {
+    try {
+      const ordersRef = collection(db, SEPARATION_ORDERS_COLLECTION);
+      const q = query(ordersRef, where("saleId", "==", saleId));
+      const snap = await getDocs(q);
+
+      if (snap.empty) return;
+
+      const orderDoc = snap.docs[0];
+      await this.updateSeparationOrderStatus(
+        orderDoc.id,
+        status,
+        "system"
+      );
+    } catch (error) {
+      console.error("Erro ao atualizar ordem de separação por venda:", error);
+      // Não lança erro para não travar a atualização da venda
     }
   },
 

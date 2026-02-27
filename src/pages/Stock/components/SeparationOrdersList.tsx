@@ -5,11 +5,13 @@ import "../../Clients/components/ClientsTable.css";
 interface SeparationOrdersListProps {
   orders: SeparationOrder[];
   onUpdateStatus: (orderId: string, status: SeparationOrder["status"]) => void;
+  readOnly?: boolean;
 }
 
 export function SeparationOrdersList({
   orders,
   onUpdateStatus,
+  readOnly = false,
 }: SeparationOrdersListProps) {
   const getStatusBadge = (status: SeparationOrder["status"]) => {
     const config: Record<
@@ -38,8 +40,12 @@ export function SeparationOrdersList({
       <div className="table-container">
         <div className="table-empty">
           <CheckCircle2 size={48} />
-          <p>Nenhuma ordem pendente</p>
-          <span>Todas as vendas foram separadas</span>
+          <p>{readOnly ? "Nenhuma ordem no histórico" : "Nenhuma ordem pendente"}</p>
+          <span>
+            {readOnly
+              ? "Ordens concluídas ou canceladas aparecem aqui"
+              : "Ordens pendentes, em separação ou prontas aparecem aqui"}
+          </span>
         </div>
       </div>
     );
@@ -56,7 +62,7 @@ export function SeparationOrdersList({
               <th>Equipamentos</th>
               <th>Data</th>
               <th>Status</th>
-              <th>Ações</th>
+              {!readOnly && <th>Ações</th>}
             </tr>
           </thead>
           <tbody>
@@ -101,38 +107,40 @@ export function SeparationOrdersList({
                   </span>
                 </td>
                 <td>{getStatusBadge(order.status)}</td>
-                <td>
-                  <div className="action-buttons">
-                    {order.status === "pending" && (
-                      <button
-                        className="btn-action btn-edit"
-                        onClick={() => onUpdateStatus(order.id, "separating")}
-                        title="Iniciar Separação"
-                      >
-                        <Play size={16} />
-                      </button>
-                    )}
-                    {order.status === "separating" && (
-                      <button
-                        className="btn-action btn-view"
-                        onClick={() => onUpdateStatus(order.id, "ready")}
-                        title="Marcar como Pronto"
-                      >
-                        <CheckCircle2 size={16} />
-                      </button>
-                    )}
-                    {order.status !== "cancelled" &&
-                      order.status !== "dispatched" && (
+                {!readOnly && (
+                  <td>
+                    <div className="action-buttons">
+                      {order.status === "pending" && (
                         <button
-                          className="btn-action btn-delete"
-                          onClick={() => onUpdateStatus(order.id, "cancelled")}
-                          title="Cancelar"
+                          className="btn-action btn-edit"
+                          onClick={() => onUpdateStatus(order.id, "separating")}
+                          title="Iniciar Separação"
                         >
-                          <XCircle size={16} />
+                          <Play size={16} />
                         </button>
                       )}
-                  </div>
-                </td>
+                      {order.status === "separating" && (
+                        <button
+                          className="btn-action btn-view"
+                          onClick={() => onUpdateStatus(order.id, "ready")}
+                          title="Marcar como Pronto"
+                        >
+                          <CheckCircle2 size={16} />
+                        </button>
+                      )}
+                      {order.status !== "cancelled" &&
+                        order.status !== "dispatched" && (
+                          <button
+                            className="btn-action btn-delete"
+                            onClick={() => onUpdateStatus(order.id, "cancelled")}
+                            title="Cancelar"
+                          >
+                            <XCircle size={16} />
+                          </button>
+                        )}
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

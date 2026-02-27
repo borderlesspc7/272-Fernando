@@ -8,6 +8,7 @@ import { StockEntryModal } from "./components/StockEntryModal";
 import { StockDispatchModal } from "./components/StockDispatchModal";
 import { StockDetailModal } from "./components/StockDetailModal";
 import { stockService } from "../../services/stockService";
+import { salesService } from "../../services/salesService";
 import { useAuth } from "../../hooks/useAuth";
 import type {
   StockItem,
@@ -46,7 +47,11 @@ export function Stock() {
       ]);
       setItems(itemsData);
       setFilteredItems(itemsData);
-      setSeparationOrders(ordersData.filter((o) => o.status !== "dispatched"));
+      setSeparationOrders(
+        ordersData.filter(
+          (o) => o.status === "pending" || o.status === "separating" || o.status === "ready"
+        )
+      );
       setStats(statsData);
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
@@ -115,12 +120,29 @@ export function Stock() {
     status: SeparationOrder["status"]
   ) => {
     try {
+      // Atualiza status da ordem de separação
       await stockService.updateSeparationOrderStatus(
         orderId,
         status,
         user?.uid || ""
       );
-      loadData();
+
+      // Se a ordem foi marcada como PRONTA, consideramos a venda como DESPACHADA
+      // → atualiza status da venda, baixa estoque e manda a ordem para o histórico
+      if (status === "ready" && user?.uid) {
+        const order = separationOrders.find((o) => o.id === orderId);
+
+        if (order) {
+          await salesService.updateSaleStatus(
+            order.saleId,
+            "dispatched",
+            "Ordem de separação pronta. Estoque despachado automaticamente.",
+            user.uid
+          );
+        }
+      }
+
+      await loadData();
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
       alert("Não foi possível atualizar o status");
@@ -218,6 +240,7 @@ export function Stock() {
             <SeparationOrdersList
               orders={separationOrders}
               onUpdateStatus={handleUpdateSeparationStatus}
+              readOnly={false}
             />
           )}
         </>

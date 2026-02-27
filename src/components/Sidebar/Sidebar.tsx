@@ -3,7 +3,6 @@ import {
   LayoutDashboard,
   ShoppingCart,
   Package,
-  Truck,
   Wrench,
   AlertCircle,
   BarChart3,
@@ -12,6 +11,7 @@ import {
   CheckSquare,
   UserCheck,
   Users,
+  History,
 } from "lucide-react";
 import "./Sidebar.css";
 
@@ -48,14 +48,9 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       label: "Estoque",
     },
     {
-      path: "/financeiro",
-      icon: BarChart3,
-      label: "Financeiro",
-    },
-    {
-      path: "/logistica",
-      icon: Truck,
-      label: "Logística",
+      path: "/historico",
+      icon: History,
+      label: "Histórico",
     },
     {
       path: "/instalacoes",
