@@ -14,3 +14,36 @@
   color: var(--text-secondary);
   margin-top: 0.5rem;
 }
+
+.history-filters {
+  margin: 1.5rem 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.history-filters .filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.history-filters label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.history-filters input,
+.history-filters select {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  font-size: 0.9rem;
+  background: #0b1220;
+  color: #e2e8f0;
+}
+
+.history-filters input::placeholder {
+  color: #64748b;
+}
