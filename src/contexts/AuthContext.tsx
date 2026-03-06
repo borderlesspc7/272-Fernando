@@ -61,8 +61,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       setError(null);
-      await authService.register(credentials);
-      setUser(null);
+      const user = await authService.register(credentials);
+      setUser(user);
     } catch (error) {
       setError(
         getFirebaseErrorMessage(error as FirebaseError | string)

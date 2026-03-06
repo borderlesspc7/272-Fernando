@@ -97,7 +97,7 @@ export const authService = {
         uid: firebaseUser.uid,
         name: credentials.name,
         email: credentials.email,
-        phone: credentials.phone,
+        phone: credentials.phone || "",
         role: credentials.role || "user",
         createdAt: new Date(),
         updatedAt: new Date(),
