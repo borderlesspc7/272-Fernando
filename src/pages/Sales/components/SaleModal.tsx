@@ -27,7 +27,7 @@ export function SaleModal({ onClose, onSuccess, createdBy }: SaleModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const { user } = useAuth();
+  useAuth();
 
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClientId, setSelectedClientId] = useState("");

@@ -5,6 +5,7 @@ import { clientService } from "../../services/clientsService";
 import { salesService } from "../../services/salesService";
 import { installationsService } from "../../services/installationsService";
 import { techniciansService } from "../../services/techniciansService";
+import { TECHNICIAN_REGION_LABELS } from "../../types/technicians";
 import { paths } from "../../routes/paths";
 import "./GlobalSearch.css";
 
@@ -138,7 +139,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
         searchResults.push({
           id: tech.id,
           title: tech.name,
-          subtitle: tech.specialties.join(", "),
+          subtitle: TECHNICIAN_REGION_LABELS[tech.region] || tech.email || tech.phone || "",
           type: "technician",
           path: paths.technicians,
         });

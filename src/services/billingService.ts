@@ -122,15 +122,18 @@ export const billingService = {
     }
 
     if (filters.dateFrom) {
-      invoices = invoices.filter(
-        (inv) =>
-          (inv.dueDate as Date) >= (filters.dateFrom as Date)
-      );
+      const from = filters.dateFrom as Date;
+      invoices = invoices.filter((inv: Invoice) => {
+        const due = inv.dueDate as Date;
+        return due >= from;
+      });
     }
     if (filters.dateTo) {
-      invoices = invoices.filter(
-        (inv.dueDate as Date) <= (filters.dateTo as Date)
-      );
+      const to = filters.dateTo as Date;
+      invoices = invoices.filter((inv: Invoice) => {
+        const due = inv.dueDate as Date;
+        return due <= to;
+      });
     }
 
     return invoices;

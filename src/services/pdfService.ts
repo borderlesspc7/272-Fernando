@@ -13,6 +13,14 @@ const formatDate = (date: Date | string) => {
   return new Intl.DateTimeFormat("pt-BR").format(d);
 };
 
+const toDateValue = (value: any): Date => {
+  if (!value) return new Date();
+  if (value instanceof Date) return value;
+  if (typeof value === "object" && typeof value.toDate === "function")
+    return value.toDate();
+  return new Date(value);
+};
+
 export const pdfService = {
   /**
    * Gera uma proposta comercial simples em PDF para a venda
@@ -28,7 +36,7 @@ export const pdfService = {
     y += 10;
 
     doc.setFontSize(11);
-    doc.text(`Data: ${formatDate(sale.saleDate as Date)}`, 14, y);
+    doc.text(`Data: ${formatDate(toDateValue(sale.saleDate))}`, 14, y);
     y += 8;
 
     doc.text(`Proposta #${sale.id}`, 14, y);
@@ -188,12 +196,12 @@ Valor da instalação: ${
     y += clause1Lines.length * 6 + 4;
 
     const clause2 = `
-CLÁUSULA 2ª - DO PRAZO
+  CLÁUSULA 2ª - DO PRAZO
 
-O presente contrato terá início em ${formatDate(
-      sale.activationDate || sale.saleDate || new Date()
+  O presente contrato terá início em ${formatDate(
+      toDateValue(sale.activationDate ?? sale.saleDate ?? new Date())
     )} e vigorará por prazo indeterminado, podendo ser rescindido por qualquer das partes mediante aviso prévio de 30 (trinta) dias.
-`;
+  `;
     const clause2Lines = doc.splitTextToSize(clause2.trim(), 180);
     doc.text(clause2Lines, 14, y);
     y += clause2Lines.length * 6 + 4;

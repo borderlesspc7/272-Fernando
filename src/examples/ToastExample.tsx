@@ -84,29 +84,5 @@ export const exampleServiceWithToast = {
 
 // EXEMPLO DE USO EM UM COMPONENTE:
 export function ClientFormExample() {
-  const handleSubmit = async (data: any) => {
-    try {
-      const promise = exampleServiceWithToast.createClient(data);
-
-      // Opção 1: Usar toast.promise
-      await toast.promise(promise, {
-        loading: "Salvando...",
-        success: "Salvo com sucesso!",
-        error: "Erro ao salvar",
-      });
-    } catch (error) {
-      // Erro já foi tratado pelo toast
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      await exampleServiceWithToast.deleteClient(id);
-      // Toast de sucesso já foi mostrado no service
-    } catch (error) {
-      // Toast de erro já foi mostrado no service
-    }
-  };
-
   return null; // Componente de exemplo
 }

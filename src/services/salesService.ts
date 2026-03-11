@@ -161,7 +161,6 @@ export const salesService = {
           technicianId: data.technicianId,
           technicianName: data.technicianName,
           technicianPhone: "",
-          status: "pending",
           scheduledDate: estimatedDate,
           equipments: data.equipments.map((eq) => ({
             itemId: eq.id,
@@ -170,7 +169,6 @@ export const salesService = {
             serialNumber: "",
             quantity: eq.quantity,
           })),
-          photos: [],
           notes: "Instalação criada automaticamente a partir da venda.",
           createdBy: data.createdBy,
         });
